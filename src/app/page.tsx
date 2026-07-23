@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/logo";
 import { MemorySearchPreview } from "@/components/marketing/memory-search-preview";
 
 export default function Home() {
@@ -7,9 +8,7 @@ export default function Home() {
     <div className="flex flex-1 flex-col">
       <header className="border-b">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-8">
-          <span className="font-heading text-sm font-medium tracking-[0.15em] uppercase">
-            Litigo
-          </span>
+          <Logo />
           <nav className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
               <Link href="/login">Sign in</Link>

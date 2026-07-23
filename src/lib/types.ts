@@ -1,6 +1,7 @@
 export type CaseStatus = "ongoing" | "disposed" | "archived";
 export type NoteOutcome = "worked" | "failed" | "untested";
 export type ResearchSourceType = "statute" | "judgment" | "article" | "other";
+export type LicenceVerificationStatus = "unverified" | "pending" | "verified" | "rejected";
 
 export interface Case {
   id: string;
@@ -53,4 +54,24 @@ export interface Memory {
   created_at: string;
   updated_at: string;
   case?: { title: string } | null;
+}
+
+export interface ProfessionalLicence {
+  id: string;
+  user_id: string;
+  country_code: string;
+  jurisdiction_name: string | null;
+  licensing_authority: string | null;
+  registration_number: string | null;
+  admission_date: string | null;
+  is_primary: boolean;
+  verification_status: LicenceVerificationStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PracticeArea {
+  id: string;
+  name: string;
+  created_at: string;
 }

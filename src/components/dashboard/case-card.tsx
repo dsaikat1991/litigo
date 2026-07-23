@@ -8,7 +8,15 @@ function pluralize(count: number, singular: string, plural: string = `${singular
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
-export function CaseCard({ caseItem }: { caseItem: Case }) {
+export function CaseCard({
+  caseItem,
+  locale,
+  timeZone,
+}: {
+  caseItem: Case;
+  locale: string;
+  timeZone: string;
+}) {
   return (
     <Link href={`/dashboard/cases/${caseItem.id}`}>
       <Card className="transition-colors hover:bg-accent/50">
@@ -20,7 +28,7 @@ export function CaseCard({ caseItem }: { caseItem: Case }) {
             </Badge>
           </div>
           <CardDescription className="text-xs">
-            Updated {formatDate(caseItem.updated_at)}
+            Updated {formatDate(caseItem.updated_at, locale, timeZone)}
             {" · "}
             {pluralize(caseItem.argument_count ?? 0, "argument")}
             {" · "}

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getArgumentNotes, getCaseById, getResearchNotes } from "@/lib/data/cases";
 import { getMemories } from "@/lib/data/memories";
+import { getCurrentProfile } from "@/lib/data/profile";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddArgumentNoteForm } from "@/components/dashboard/add-argument-note-form";
@@ -19,11 +20,14 @@ export default async function CaseDetailPage({
   const caseItem = await getCaseById(id);
   if (!caseItem) notFound();
 
-  const [argumentNotes, researchNotes, memories] = await Promise.all([
+  const [argumentNotes, researchNotes, memories, profile] = await Promise.all([
     getArgumentNotes(id),
     getResearchNotes(id),
     getMemories({ caseId: id }),
+    getCurrentProfile(),
   ]);
+  const locale = profile?.locale ?? "en-IN";
+  const timeZone = profile?.timezone ?? "Asia/Kolkata";
 
   return (
     <div className="flex flex-col gap-6">
@@ -40,9 +44,9 @@ export default async function CaseDetailPage({
             .join(" · ")}
         </p>
         <p className="text-xs text-muted-foreground">
-          Created {formatDate(caseItem.created_at)}
+          Created {formatDate(caseItem.created_at, locale, timeZone)}
           {caseItem.updated_at !== caseItem.created_at &&
-            ` · Updated ${formatDate(caseItem.updated_at)}`}
+            ` · Updated ${formatDate(caseItem.updated_at, locale, timeZone)}`}
         </p>
         {caseItem.summary && <p className="text-sm">{caseItem.summary}</p>}
         {caseItem.tags.length > 0 && (
@@ -64,15 +68,20 @@ export default async function CaseDetailPage({
         </TabsList>
         <TabsContent value="arguments" className="flex flex-col gap-4">
           <AddArgumentNoteForm caseId={id} />
-          <ArgumentNoteList notes={argumentNotes} />
+          <ArgumentNoteList notes={argumentNotes} locale={locale} timeZone={timeZone} />
         </TabsContent>
         <TabsContent value="research" className="flex flex-col gap-4">
           <AddResearchNoteForm caseId={id} />
-          <ResearchNoteList notes={researchNotes} />
+          <ResearchNoteList notes={researchNotes} locale={locale} timeZone={timeZone} />
         </TabsContent>
         <TabsContent value="memory" className="flex flex-col gap-4">
           <AddMemoryForm caseId={id} />
-          <MemoryList memories={memories} emptyLabel="No memories saved on this case yet." />
+          <MemoryList
+            memories={memories}
+            emptyLabel="No memories saved on this case yet."
+            locale={locale}
+            timeZone={timeZone}
+          />
         </TabsContent>
       </Tabs>
     </div>

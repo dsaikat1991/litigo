@@ -17,10 +17,14 @@ export function MemoryList({
   memories,
   showCaseLink = false,
   emptyLabel = "No memories yet.",
+  locale,
+  timeZone,
 }: {
   memories: Memory[];
   showCaseLink?: boolean;
   emptyLabel?: string;
+  locale: string;
+  timeZone: string;
 }) {
   const [selected, setSelected] = useState<Memory | null>(null);
 
@@ -41,7 +45,7 @@ export function MemoryList({
             <div className="flex items-start justify-between gap-3">
               <p className="text-sm font-medium">{previewText(memory.content)}</p>
               <span className="shrink-0 text-xs text-muted-foreground">
-                {formatDate(memory.created_at)}
+                {formatDate(memory.created_at, locale, timeZone)}
               </span>
             </div>
             {(memory.tags.length > 0 || (showCaseLink && memory.case_id && memory.case)) && (
@@ -72,7 +76,9 @@ export function MemoryList({
           <DialogHeader>
             <DialogTitle>Memory</DialogTitle>
             {selected && (
-              <DialogDescription>{formatDateTime(selected.created_at)}</DialogDescription>
+              <DialogDescription>
+                {formatDateTime(selected.created_at, locale, timeZone)}
+              </DialogDescription>
             )}
           </DialogHeader>
           {selected && (

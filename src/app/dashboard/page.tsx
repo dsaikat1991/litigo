@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { Search, SlidersHorizontal, X } from "lucide-react";
 import { getCases } from "@/lib/data/cases";
 import { getMemories } from "@/lib/data/memories";
 import { getCurrentProfile } from "@/lib/data/profile";
@@ -9,7 +7,7 @@ import { AddMemoryDialog } from "@/components/dashboard/add-memory-dialog";
 import { CaseCard } from "@/components/dashboard/case-card";
 import { MemoryList } from "@/components/dashboard/memory-list";
 import { Greeting } from "@/components/dashboard/greeting";
-import { Button } from "@/components/ui/button";
+import { SearchBar } from "@/components/dashboard/search-bar";
 
 const EXAMPLE_QUERIES = ["mutation does not confer title", "section 54 limitation", "specific performance"];
 
@@ -24,6 +22,8 @@ export default async function DashboardPage({
     getMemories({ search: q }),
     getCurrentProfile(),
   ]);
+  const locale = profile?.locale ?? "en-IN";
+  const timeZone = profile?.timezone ?? "Asia/Kolkata";
 
   return (
     <div className="flex flex-col gap-8">
@@ -35,48 +35,7 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <form action="/dashboard" className="flex flex-col gap-2">
-        <div className="flex items-center gap-2.5 rounded-xl border px-4 py-3.5 focus-within:border-foreground">
-          <Search className="text-muted-foreground size-[17px] shrink-0" />
-          <input
-            type="search"
-            name="q"
-            defaultValue={q ?? ""}
-            placeholder="Search your legal memory…"
-            className="placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:appearance-none flex-1 bg-transparent text-[14.5px] outline-none"
-          />
-          {q && (
-            <Button asChild variant="ghost" size="icon" aria-label="Clear search">
-              <Link href="/dashboard">
-                <X className="size-4" />
-              </Link>
-            </Button>
-          )}
-          {/* No advanced filtering exists yet — shown but inert rather than faking a feature. */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label="Search filters (coming soon)"
-          >
-            <SlidersHorizontal className="size-4" />
-          </Button>
-        </div>
-        <div className="flex items-center justify-between gap-3 px-1">
-          <p className="text-muted-foreground text-xs">
-            Try:{" "}
-            {EXAMPLE_QUERIES.map((query, i) => (
-              <span key={query}>
-                <strong className="text-foreground font-medium">&ldquo;{query}&rdquo;</strong>
-                {i < EXAMPLE_QUERIES.length - 1 && " or "}
-              </span>
-            ))}
-          </p>
-          <span className="text-verified shrink-0 text-xs font-medium" aria-disabled>
-            Advanced search
-          </span>
-        </div>
-      </form>
+      <SearchBar defaultValue={q ?? ""} exampleQueries={EXAMPLE_QUERIES} />
 
       <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1.55fr_1fr]">
         <section className="flex flex-col gap-3.5">
@@ -93,7 +52,7 @@ export default async function DashboardPage({
           ) : (
             <div className="flex flex-col gap-3">
               {cases.map((c) => (
-                <CaseCard key={c.id} caseItem={c} />
+                <CaseCard key={c.id} caseItem={c} locale={locale} timeZone={timeZone} />
               ))}
             </div>
           )}
@@ -110,6 +69,8 @@ export default async function DashboardPage({
             memories={memories}
             showCaseLink
             emptyLabel={q ? "No memories match that search." : "No memories yet."}
+            locale={locale}
+            timeZone={timeZone}
           />
         </section>
       </div>

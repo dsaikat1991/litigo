@@ -17,21 +17,28 @@ export function previewText(content: string, maxLen = 50): string {
   return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + "…";
 }
 
-export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-IN", {
+// locale/timeZone are required, not defaulted — they must come from the
+// viewer's own profile (see getCurrentProfile), not an ambient runtime
+// default. A bare `undefined` here would resolve differently in a Server
+// Component (the Node process's default) than in a Client Component (the
+// browser's), producing inconsistent formatting for the same viewer.
+export function formatDate(iso: string, locale: string, timeZone: string): string {
+  return new Date(iso).toLocaleDateString(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
+    timeZone,
   });
 }
 
-export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("en-IN", {
+export function formatDateTime(iso: string, locale: string, timeZone: string): string {
+  return new Date(iso).toLocaleString(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZone,
   });
 }
 

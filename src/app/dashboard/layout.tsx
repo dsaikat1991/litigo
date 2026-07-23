@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/data/profile";
 import { getInitials } from "@/lib/utils";
 import { HeaderProfileMenu } from "@/components/dashboard/header-profile-menu";
+import { Logo } from "@/components/logo";
 
 export default async function DashboardLayout({
   children,
@@ -16,11 +17,8 @@ export default async function DashboardLayout({
     <div className="flex min-h-full flex-1 flex-col">
       <header className="border-b">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-8">
-          <Link
-            href="/dashboard"
-            className="font-heading text-sm font-medium tracking-[0.15em] uppercase"
-          >
-            Litigo
+          <Link href="/dashboard">
+            <Logo />
           </Link>
           <HeaderProfileMenu
             initials={getInitials(profile.fullName, profile.email)}

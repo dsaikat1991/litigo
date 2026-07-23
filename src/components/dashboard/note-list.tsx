@@ -15,7 +15,15 @@ function Tags({ tags }: { tags: string[] }) {
   );
 }
 
-export function ArgumentNoteList({ notes }: { notes: ArgumentNote[] }) {
+export function ArgumentNoteList({
+  notes,
+  locale,
+  timeZone,
+}: {
+  notes: ArgumentNote[];
+  locale: string;
+  timeZone: string;
+}) {
   if (notes.length === 0) {
     return <p className="text-sm text-muted-foreground">No arguments recorded yet.</p>;
   }
@@ -26,7 +34,9 @@ export function ArgumentNoteList({ notes }: { notes: ArgumentNote[] }) {
           <div className="flex items-start justify-between gap-2">
             {note.issue && <p className="text-sm font-medium">{note.issue}</p>}
             <div className="ml-auto flex shrink-0 items-center gap-2">
-              <span className="text-xs text-muted-foreground">{formatDate(note.created_at)}</span>
+              <span className="text-xs text-muted-foreground">
+                {formatDate(note.created_at, locale, timeZone)}
+              </span>
               {note.outcome && (
                 <Badge
                   variant={note.outcome === "worked" ? "verified" : "secondary"}
@@ -45,7 +55,15 @@ export function ArgumentNoteList({ notes }: { notes: ArgumentNote[] }) {
   );
 }
 
-export function ResearchNoteList({ notes }: { notes: ResearchNote[] }) {
+export function ResearchNoteList({
+  notes,
+  locale,
+  timeZone,
+}: {
+  notes: ResearchNote[];
+  locale: string;
+  timeZone: string;
+}) {
   if (notes.length === 0) {
     return <p className="text-sm text-muted-foreground">No research recorded yet.</p>;
   }
@@ -56,7 +74,9 @@ export function ResearchNoteList({ notes }: { notes: ResearchNote[] }) {
           <div className="flex items-start justify-between gap-2">
             {note.citation && <p className="text-sm font-medium">{note.citation}</p>}
             <div className="ml-auto flex shrink-0 items-center gap-2">
-              <span className="text-xs text-muted-foreground">{formatDate(note.created_at)}</span>
+              <span className="text-xs text-muted-foreground">
+                {formatDate(note.created_at, locale, timeZone)}
+              </span>
               {note.source_type && (
                 <Badge variant="secondary" className="capitalize">
                   {note.source_type}
