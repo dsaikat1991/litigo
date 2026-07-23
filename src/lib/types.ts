@@ -15,6 +15,9 @@ export interface Case {
   tags: string[];
   created_at: string;
   updated_at: string;
+  argument_count?: number;
+  research_count?: number;
+  memory_count?: number;
 }
 
 export interface ArgumentNote {
@@ -39,4 +42,15 @@ export interface ResearchNote {
   tags: string[];
   created_at: string;
   updated_at: string;
+}
+
+export interface Memory {
+  id: string;
+  owner_id: string;
+  case_id: string | null;
+  content: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+  case?: { title: string } | null;
 }

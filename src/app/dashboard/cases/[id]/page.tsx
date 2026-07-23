@@ -1,10 +1,14 @@
 import { notFound } from "next/navigation";
 import { getArgumentNotes, getCaseById, getResearchNotes } from "@/lib/data/cases";
+import { getMemories } from "@/lib/data/memories";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddArgumentNoteForm } from "@/components/dashboard/add-argument-note-form";
 import { AddResearchNoteForm } from "@/components/dashboard/add-research-note-form";
+import { AddMemoryForm } from "@/components/dashboard/add-memory-form";
 import { ArgumentNoteList, ResearchNoteList } from "@/components/dashboard/note-list";
+import { MemoryList } from "@/components/dashboard/memory-list";
+import { formatDate } from "@/lib/utils";
 
 export default async function CaseDetailPage({
   params,
@@ -15,9 +19,10 @@ export default async function CaseDetailPage({
   const caseItem = await getCaseById(id);
   if (!caseItem) notFound();
 
-  const [argumentNotes, researchNotes] = await Promise.all([
+  const [argumentNotes, researchNotes, memories] = await Promise.all([
     getArgumentNotes(id),
     getResearchNotes(id),
+    getMemories({ caseId: id }),
   ]);
 
   return (
@@ -33,6 +38,11 @@ export default async function CaseDetailPage({
           {[caseItem.case_number, caseItem.court, caseItem.case_type, caseItem.parties]
             .filter(Boolean)
             .join(" · ")}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Created {formatDate(caseItem.created_at)}
+          {caseItem.updated_at !== caseItem.created_at &&
+            ` · Updated ${formatDate(caseItem.updated_at)}`}
         </p>
         {caseItem.summary && <p className="text-sm">{caseItem.summary}</p>}
         {caseItem.tags.length > 0 && (
@@ -50,6 +60,7 @@ export default async function CaseDetailPage({
         <TabsList>
           <TabsTrigger value="arguments">Arguments</TabsTrigger>
           <TabsTrigger value="research">Research</TabsTrigger>
+          <TabsTrigger value="memory">Memory</TabsTrigger>
         </TabsList>
         <TabsContent value="arguments" className="flex flex-col gap-4">
           <AddArgumentNoteForm caseId={id} />
@@ -58,6 +69,10 @@ export default async function CaseDetailPage({
         <TabsContent value="research" className="flex flex-col gap-4">
           <AddResearchNoteForm caseId={id} />
           <ResearchNoteList notes={researchNotes} />
+        </TabsContent>
+        <TabsContent value="memory" className="flex flex-col gap-4">
+          <AddMemoryForm caseId={id} />
+          <MemoryList memories={memories} emptyLabel="No memories saved on this case yet." />
         </TabsContent>
       </Tabs>
     </div>

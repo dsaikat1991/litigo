@@ -1,7 +1,12 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils";
 import type { Case } from "@/lib/types";
+
+function pluralize(count: number, singular: string, plural: string = `${singular}s`): string {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
 
 export function CaseCard({ caseItem }: { caseItem: Case }) {
   return (
@@ -14,6 +19,15 @@ export function CaseCard({ caseItem }: { caseItem: Case }) {
               {caseItem.status}
             </Badge>
           </div>
+          <CardDescription className="text-xs">
+            Updated {formatDate(caseItem.updated_at)}
+            {" · "}
+            {pluralize(caseItem.argument_count ?? 0, "argument")}
+            {" · "}
+            {pluralize(caseItem.research_count ?? 0, "research note")}
+            {" · "}
+            {pluralize(caseItem.memory_count ?? 0, "memory", "memories")}
+          </CardDescription>
         </CardHeader>
         {(caseItem.summary || caseItem.tags.length > 0) && (
           <CardContent className="flex flex-col gap-3">

@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils";
 import type { ArgumentNote, ResearchNote } from "@/lib/types";
 
 function Tags({ tags }: { tags: string[] }) {
@@ -24,14 +25,17 @@ export function ArgumentNoteList({ notes }: { notes: ArgumentNote[] }) {
         <div key={note.id} className="flex flex-col gap-2 rounded-lg border p-4">
           <div className="flex items-start justify-between gap-2">
             {note.issue && <p className="text-sm font-medium">{note.issue}</p>}
-            {note.outcome && (
-              <Badge
-                variant={note.outcome === "worked" ? "default" : "secondary"}
-                className="capitalize shrink-0"
-              >
-                {note.outcome}
-              </Badge>
-            )}
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              <span className="text-xs text-muted-foreground">{formatDate(note.created_at)}</span>
+              {note.outcome && (
+                <Badge
+                  variant={note.outcome === "worked" ? "verified" : "secondary"}
+                  className="capitalize"
+                >
+                  {note.outcome}
+                </Badge>
+              )}
+            </div>
           </div>
           <p className="whitespace-pre-wrap text-sm text-muted-foreground">{note.content}</p>
           <Tags tags={note.tags} />
@@ -51,11 +55,14 @@ export function ResearchNoteList({ notes }: { notes: ResearchNote[] }) {
         <div key={note.id} className="flex flex-col gap-2 rounded-lg border p-4">
           <div className="flex items-start justify-between gap-2">
             {note.citation && <p className="text-sm font-medium">{note.citation}</p>}
-            {note.source_type && (
-              <Badge variant="secondary" className="capitalize shrink-0">
-                {note.source_type}
-              </Badge>
-            )}
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              <span className="text-xs text-muted-foreground">{formatDate(note.created_at)}</span>
+              {note.source_type && (
+                <Badge variant="secondary" className="capitalize">
+                  {note.source_type}
+                </Badge>
+              )}
+            </div>
           </div>
           <p className="whitespace-pre-wrap text-sm text-muted-foreground">{note.content}</p>
           <Tags tags={note.tags} />
