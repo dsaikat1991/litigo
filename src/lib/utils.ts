@@ -48,9 +48,17 @@ function displayNameSource(fullName: string | null, email: string | null): strin
   return null;
 }
 
+// Normalizes to Title Case regardless of how the name was originally typed
+// (e.g. a profile saved as "SAIKAT DAS" shouldn't shout in a greeting) —
+// purely a display fix, never written back to the stored full_name.
+function toTitleCase(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
 export function getFirstName(fullName: string | null, email: string | null): string | null {
   const source = displayNameSource(fullName, email);
-  return source ? source.split(/\s+/)[0] : null;
+  const first = source ? source.split(/\s+/)[0] : null;
+  return first ? toTitleCase(first) : null;
 }
 
 export function getInitials(fullName: string | null, email: string | null): string {

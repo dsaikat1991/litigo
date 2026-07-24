@@ -46,8 +46,48 @@ export default function Home() {
         <MemorySearchPreview />
       </main>
 
-      <footer className="border-t py-6 text-center font-heading text-xs tracking-widest text-muted-foreground uppercase">
-        We believe legal experience should compound, not disappear.
+      <footer className="border-t px-4 py-6 sm:px-8">
+        <div className="flex flex-col items-center gap-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+          <nav className="order-2 flex items-center gap-4 sm:order-1 sm:justify-self-start">
+            <Link
+              href="/about"
+              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
+            >
+              About
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
+            >
+              How It Works
+            </Link>
+          </nav>
+
+          <p className="font-heading order-1 text-center text-xs tracking-widest text-muted-foreground uppercase sm:order-2">
+            We believe legal experience should compound, not disappear.
+          </p>
+
+          <nav className="order-3 flex items-center gap-4 sm:justify-self-end">
+            <Link
+              href="/terms"
+              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/contact"
+              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
+            >
+              Contact
+            </Link>
+          </nav>
+        </div>
       </footer>
     </div>
   );

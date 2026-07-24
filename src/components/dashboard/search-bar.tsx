@@ -87,6 +87,17 @@ export function SearchBar({
               <X className="size-4" />
             </Button>
           )}
+          {!value && (
+            <button
+              type="button"
+              aria-label="Open command palette"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => window.dispatchEvent(new CustomEvent("litigo:open-command-palette"))}
+              className="text-muted-foreground hover:border-foreground/30 hover:text-foreground hidden shrink-0 items-center gap-0.5 rounded-md border px-1.5 py-0.5 text-[10px] font-medium sm:flex"
+            >
+              ⌘K
+            </button>
+          )}
           {/* No advanced filtering exists yet — shown but inert rather than faking a feature. */}
           <Button
             type="button"

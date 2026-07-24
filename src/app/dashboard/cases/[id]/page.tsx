@@ -9,6 +9,8 @@ import { AddResearchNoteForm } from "@/components/dashboard/add-research-note-fo
 import { AddMemoryForm } from "@/components/dashboard/add-memory-form";
 import { ArgumentNoteList, ResearchNoteList } from "@/components/dashboard/note-list";
 import { MemoryList } from "@/components/dashboard/memory-list";
+import { EditCaseDialog } from "@/components/dashboard/edit-case-dialog";
+import { DeleteCaseButton } from "@/components/dashboard/delete-case-button";
 import { formatDate } from "@/lib/utils";
 
 export default async function CaseDetailPage({
@@ -34,9 +36,13 @@ export default async function CaseDetailPage({
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
           <h1 className="font-heading text-lg font-medium">{caseItem.title}</h1>
-          <Badge variant="secondary" className="capitalize">
-            {caseItem.status}
-          </Badge>
+          <div className="flex shrink-0 items-center gap-2">
+            <Badge variant="secondary" className="capitalize">
+              {caseItem.status}
+            </Badge>
+            <EditCaseDialog caseItem={caseItem} />
+            <DeleteCaseButton caseId={caseItem.id} title={caseItem.title} />
+          </div>
         </div>
         <p className="text-sm text-muted-foreground">
           {[caseItem.case_number, caseItem.court, caseItem.case_type, caseItem.parties]

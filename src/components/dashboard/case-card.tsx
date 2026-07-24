@@ -27,6 +27,13 @@ export function CaseCard({
               {caseItem.status}
             </Badge>
           </div>
+          {(caseItem.case_number || caseItem.case_type) && (
+            <p className="text-xs text-muted-foreground">
+              {[caseItem.case_type, caseItem.case_number ? `Case No. ${caseItem.case_number}` : null]
+                .filter(Boolean)
+                .join(" • ")}
+            </p>
+          )}
           <CardDescription className="text-xs">
             Updated {formatDate(caseItem.updated_at, locale, timeZone)}
             {" · "}

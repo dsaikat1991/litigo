@@ -1,4 +1,8 @@
 import { Badge } from "@/components/ui/badge";
+import { EditArgumentNoteDialog } from "@/components/dashboard/edit-argument-note-dialog";
+import { EditResearchNoteDialog } from "@/components/dashboard/edit-research-note-dialog";
+import { DeleteNoteButton } from "@/components/dashboard/delete-note-button";
+import { deleteArgumentNote, deleteResearchNote } from "@/lib/actions/notes";
 import { formatDate } from "@/lib/utils";
 import type { ArgumentNote, ResearchNote } from "@/lib/types";
 
@@ -45,6 +49,13 @@ export function ArgumentNoteList({
                   {note.outcome}
                 </Badge>
               )}
+              <EditArgumentNoteDialog note={note} />
+              <DeleteNoteButton
+                action={deleteArgumentNote}
+                id={note.id}
+                caseId={note.case_id}
+                itemLabel="argument"
+              />
             </div>
           </div>
           <p className="whitespace-pre-wrap text-sm text-muted-foreground">{note.content}</p>
@@ -82,6 +93,13 @@ export function ResearchNoteList({
                   {note.source_type}
                 </Badge>
               )}
+              <EditResearchNoteDialog note={note} />
+              <DeleteNoteButton
+                action={deleteResearchNote}
+                id={note.id}
+                caseId={note.case_id}
+                itemLabel="research note"
+              />
             </div>
           </div>
           <p className="whitespace-pre-wrap text-sm text-muted-foreground">{note.content}</p>

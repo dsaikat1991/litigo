@@ -29,15 +29,6 @@ export default async function ProfessionalDetailsPage() {
       </CardHeader>
       <CardContent>
         <form action={saveProfessionalDetails} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="organisation_name">Organisation</Label>
-            <Input
-              id="organisation_name"
-              name="organisation_name"
-              placeholder="e.g. your chamber or firm name"
-            />
-          </div>
-
           <PracticeAreaPicker practiceAreas={practiceAreas} />
 
           <div className="flex flex-col gap-2">

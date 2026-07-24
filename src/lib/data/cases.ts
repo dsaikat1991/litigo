@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { ArgumentNote, Case, ResearchNote } from "@/lib/types";
+import type { ArgumentNote, Case, CaseStatus, ResearchNote } from "@/lib/types";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -36,15 +36,14 @@ async function attachCounts(supabase: SupabaseClient, cases: Case[]): Promise<Ca
   }));
 }
 
-export async function getCases(search?: string): Promise<Case[]> {
+export async function getCases(search?: string, status?: CaseStatus): Promise<Case[]> {
   const supabase = await createClient();
   const trimmed = search?.trim();
 
   if (!trimmed) {
-    const { data, error } = await supabase
-      .from("cases")
-      .select("*")
-      .order("updated_at", { ascending: false });
+    let query = supabase.from("cases").select("*").order("updated_at", { ascending: false });
+    if (status) query = query.eq("status", status);
+    const { data, error } = await query;
     if (error) throw error;
     return attachCounts(supabase, data ?? []);
   }
@@ -77,11 +76,13 @@ export async function getCases(search?: string): Promise<Case[]> {
 
   if (matchingIds.length === 0) return [];
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("cases")
     .select("*")
     .in("id", matchingIds)
     .order("updated_at", { ascending: false });
+  if (status) query = query.eq("status", status);
+  const { data, error } = await query;
   if (error) throw error;
   return attachCounts(supabase, data ?? []);
 }

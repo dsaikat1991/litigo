@@ -12,14 +12,25 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export function AddMemoryDialog() {
-  const [open, setOpen] = useState(false);
+export function AddMemoryDialog({
+  open,
+  onOpenChange,
+}: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+} = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = open !== undefined;
+  const dialogOpen = isControlled ? open : internalOpen;
+  const setDialogOpen = isControlled ? onOpenChange! : setInternalOpen;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Add memory</Button>
-      </DialogTrigger>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button variant="outline">Add memory</Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add memory</DialogTitle>
@@ -27,7 +38,7 @@ export function AddMemoryDialog() {
             A quick note — no case required. Link it to a case later if it turns out to matter.
           </DialogDescription>
         </DialogHeader>
-        <AddMemoryForm onSubmit={() => setOpen(false)} />
+        <AddMemoryForm onSubmit={() => setDialogOpen(false)} />
       </DialogContent>
     </Dialog>
   );

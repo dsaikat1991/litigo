@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signUp } from "@/lib/actions/auth";
+import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,14 @@ export default async function SignupPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <GoogleSignInButton />
+
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">or</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
           <form action={signUp} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="fullName">Full name</Label>

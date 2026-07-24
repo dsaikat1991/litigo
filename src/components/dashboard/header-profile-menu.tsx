@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell } from "lucide-react";
+import Link from "next/link";
 import { signOut } from "@/lib/actions/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,9 @@ export function HeaderProfileMenu({
               <DropdownMenuSeparator />
             </>
           )}
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/profile">Profile</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => signOut()}>Sign out</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

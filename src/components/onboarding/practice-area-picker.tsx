@@ -6,15 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { PracticeArea } from "@/lib/types";
 
-interface Selection {
+export interface Selection {
   id?: string;
   name: string;
 }
 
-export function PracticeAreaPicker({ practiceAreas }: { practiceAreas: PracticeArea[] }) {
+export function PracticeAreaPicker({
+  practiceAreas,
+  initialSelected = [],
+}: {
+  practiceAreas: PracticeArea[];
+  initialSelected?: Selection[];
+}) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<Selection[]>([]);
+  const [selected, setSelected] = useState<Selection[]>(initialSelected);
 
   const trimmed = query.trim();
   const isSelected = (name: string) =>

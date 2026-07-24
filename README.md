@@ -33,7 +33,6 @@ free hosted Supabase project instead.
    3. `20260725000000_add_profile_locale.sql` — per-user locale/timezone
    4. `20260726000000_global_profile_restructure.sql` — professional_licences, practice_areas,
       user_practice_areas; drops the unused `bar_registration_number` column
-   5. `20260727000000_add_profile_organisation.sql` — `profiles.organisation_name`
 5. **Disable email confirmation for local testing** (optional): Authentication → Providers →
    Email → turn off "Confirm email", so sign-up logs you straight in without needing a real inbox.
    **Re-enable this before any real user signs up with a real email** — see handoff doc.
@@ -59,8 +58,8 @@ Row Level Security means every advocate only ever sees their own cases, notes, a
   one case (`case_id` nullable, `on delete set null` — a memory outlives the case it was linked
   to). No title field by design; the UI derives a preview from the first line of content.
 - **profiles** — full_name, display_name, professional_title, bio, avatar_url, date_of_birth,
-  country_code, currency_code, preferred_language, organisation_name, **locale + timezone**
-  (used by every date-formatting call in the app — see "Locale/timezone" below).
+  country_code, currency_code, preferred_language, **locale + timezone** (used by every
+  date-formatting call in the app — see "Locale/timezone" below).
 - **professional_licences** — multi-jurisdiction bar/licensing records per user (country_code,
   jurisdiction_name, licensing_authority, registration_number, admission_date, is_primary —
   enforced to at most one primary per user via a partial unique index).
@@ -91,9 +90,9 @@ pattern.
   actual queries use plain `ILIKE '%term%'`, which requires an exact substring — a typo like
   "conveyence" will not match "conveyance" today. Explicitly flagged as an open ask ("make search
   extremely smart") that still needs a scoping conversation before building.
-- **Organisations/chambers as a real multi-tenant feature** (teams, roles, invites). Deliberately
-  deferred twice now — it's orthogonal to "going global," which is about jurisdiction, not teams.
-  `profiles.organisation_name` is just a free-text field for now, not a relational feature.
+- **Organisations/chambers, in any form** (teams, roles, invites, or even a simple free-text
+  affiliation field). Deliberately deferred — it's orthogonal to "going global," which is about
+  jurisdiction, not teams. Not currently represented anywhere in the schema or profile UI.
 - **Linking an existing standalone memory to a case after the fact**, and **promoting a memory
   into a formal argument/research note** — both named on the user's own roadmap as future, not
   part of the current Memory feature.

@@ -18,9 +18,9 @@ Verified live in-browser this session, not just compiled:
   Email confirmation is currently **disabled** for dev convenience — re-enable before real users
   sign up with real emails they can't fake-confirm.
 - **Onboarding** (`/onboarding/personalize` → `/onboarding/details`): country/professional
-  title/primary jurisdiction/timezone (required step), then organisation/practice
-  areas/licensing details (skippable step). Practice areas use a real find-or-create picker
-  (normalized `practice_areas` table, not free text).
+  title/primary jurisdiction/timezone (required step), then practice areas/licensing details
+  (skippable step). Practice areas use a real find-or-create picker (normalized `practice_areas`
+  table, not free text).
 - **Dashboard**: greeting (time-of-day, computed client-side to avoid a server/client mismatch),
   hero search bar with a custom recent-searches dropdown (localStorage, last 5) + example-query
   fallback, two-column Cases/Memories layout, per-case argument/research/memory counts.
@@ -80,7 +80,7 @@ There's currently no page in the app where a user can *see or edit* their own pr
 onboarding — onboarding writes the data, but nothing reads it back into an editable UI. Needs:
 - A `/dashboard/profile` (or similar) route, gated the same way `/dashboard` is.
 - Read + edit for everything onboarding collects: full_name, display_name, professional_title,
-  bio, avatar_url, country_code, organisation_name, locale, timezone.
+  bio, avatar_url, country_code, locale, timezone.
 - Should probably also surface (read/edit) `professional_licences` (their primary jurisdiction +
   registration details) and `user_practice_areas` (reuse the `PracticeAreaPicker` component —
   it already exists at `src/components/onboarding/practice-area-picker.tsx` and takes
