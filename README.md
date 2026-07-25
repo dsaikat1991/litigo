@@ -12,6 +12,9 @@ and quick-capture notes, and find any of it again years later.
   "What's deliberately not built yet")
 - Fonts: Inter (body/UI) + IBM Plex Mono (headings/brand — deliberately not Geist, the
   create-next-app default)
+- Google Analytics 4 (`@next/third-parties/google`) — optional, only loads on a real production
+  build when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set, so local dev traffic never pollutes the
+  account
 
 ## First-time setup
 
@@ -25,6 +28,7 @@ free hosted Supabase project instead.
    ```
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   NEXT_PUBLIC_GA_MEASUREMENT_ID=your-ga4-measurement-id   # optional
    ```
 4. **Run every migration in `supabase/migrations/` in order**, oldest first, via the Supabase
    dashboard's SQL Editor (or `supabase db push` if you've linked the CLI):

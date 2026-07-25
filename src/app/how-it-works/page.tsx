@@ -59,7 +59,7 @@ export default function HowItWorksPage() {
                   Outcome
                 </span>
                 <p className="flex items-center gap-1.5 text-sm">
-                  <span className="bg-verified/15 text-verified flex size-[16px] shrink-0 items-center justify-center rounded-full">
+                  <span className="bg-verified/15 text-verified flex size-4 shrink-0 items-center justify-center rounded-full">
                     <Check className="size-2.5" strokeWidth={3} />
                   </span>
                   Worked — decree for specific performance granted.

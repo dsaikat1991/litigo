@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,6 +20,11 @@ export const metadata: Metadata = {
     "Litigo preserves the case knowledge, arguments, and research an advocate builds over a career, and makes it findable again.",
 };
 
+const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+// Only report real visitors — local dev/testing traffic shouldn't pollute
+// the account, so this only loads for an actual production deployment.
+const shouldLoadAnalytics = process.env.NODE_ENV === "production" && !!gaMeasurementId;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,6 +36,7 @@ export default function RootLayout({
       className={`${inter.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
+      {shouldLoadAnalytics && <GoogleAnalytics gaId={gaMeasurementId} />}
     </html>
   );
 }
