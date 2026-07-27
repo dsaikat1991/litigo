@@ -15,6 +15,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mylitigo.com"),
   title: "Litigo — Your legal memory",
   description:
     "Litigo preserves the case knowledge, arguments, and research an advocate builds over a career, and makes it findable again.",
