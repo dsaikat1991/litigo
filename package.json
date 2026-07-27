@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@next/third-parties": "^16.2.11",
+    "@sentry/nextjs": "^10.68.0",
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.8",
     "class-variance-authority": "^0.7.1",
