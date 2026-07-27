@@ -1,5 +1,12 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Logo } from "@/components/logo";
+
+export const metadata: Metadata = {
+  title: "About — Litigo",
+  description:
+    "Litigo is a legal memory platform built for litigating advocates — not a case-diary or billing tool, but a place to keep the arguments, research, and lessons from every matter you've ever handled.",
+};
 
 export default function AboutPage() {
   return (

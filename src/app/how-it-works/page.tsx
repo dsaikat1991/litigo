@@ -1,6 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import { Logo } from "@/components/logo";
+
+export const metadata: Metadata = {
+  title: "How It Works — Litigo",
+  description:
+    "Capture a case in seconds, tag it your way, and find it again in one search — see how Litigo turns your legal experience into a searchable memory.",
+};
 
 export default function HowItWorksPage() {
   return (

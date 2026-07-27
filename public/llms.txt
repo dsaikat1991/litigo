@@ -1,0 +1,19 @@
+# Litigo
+
+> A legal memory platform for litigating advocates — preserve case knowledge, arguments, research, and quick-capture notes, and find any of it again years later.
+
+Litigo is not a case-management, billing, or court-diary tool. It's a personal legal memory system: capture the arguments you made on a matter, the research behind them, and the lessons you took from the outcome, then search across everything you've ever logged in one place, years later.
+
+## Pages
+
+- [Home](https://mylitigo.com/): Product overview — "Your legal memory, finally findable."
+- [About](https://mylitigo.com/about): Why Litigo exists and who it's built for.
+- [How It Works](https://mylitigo.com/how-it-works): The Capture, Tag, and Search workflow, with a worked example.
+- [Sign up](https://mylitigo.com/signup): Create an account.
+- [Sign in](https://mylitigo.com/login): Existing users.
+
+## Legal
+
+- [Terms](https://mylitigo.com/terms)
+- [Privacy](https://mylitigo.com/privacy)
+- [Contact](https://mylitigo.com/contact)
