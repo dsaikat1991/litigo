@@ -27,7 +27,9 @@ export function Greeting({ name }: { name: string | null }) {
         {greeting}
         {name ? `, ${name}` : ""}.
       </h1>
-      <p className="text-muted-foreground mt-1 text-sm">What are you looking for today?</p>
+      <p className="text-muted-foreground mt-1 text-sm">
+        Continue your work or recall something from your practice.
+      </p>
     </div>
   );
 }

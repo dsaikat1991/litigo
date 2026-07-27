@@ -1,8 +1,18 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import type { CaseStatus } from "@/lib/types"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+// Ongoing gets the app's accent color (it's the active, current state);
+// disposed gets a neutral light-grey treatment (concluded, but not archived
+// away); archived gets the solid/dark treatment as the most final state.
+export function caseStatusBadgeVariant(status: CaseStatus): "default" | "verified" | "secondary" {
+  if (status === "ongoing") return "verified";
+  if (status === "archived") return "default";
+  return "secondary";
 }
 
 // Derives a card preview from a memory's content: first non-empty line,

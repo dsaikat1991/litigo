@@ -6,8 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { MemoryCaseSelect } from "@/components/dashboard/memory-case-select";
 
-export function AddMemoryForm({ caseId, onSubmit }: { caseId?: string; onSubmit?: () => void }) {
+export function AddMemoryForm({
+  caseId,
+  cases,
+  onSubmit,
+}: {
+  caseId?: string;
+  cases?: { id: string; title: string }[];
+  onSubmit?: () => void;
+}) {
   const uid = useId();
 
   return (
@@ -16,7 +25,17 @@ export function AddMemoryForm({ caseId, onSubmit }: { caseId?: string; onSubmit?
       onSubmit={onSubmit}
       className="flex flex-col gap-3 rounded-lg border p-4"
     >
-      {caseId && <input type="hidden" name="case_id" value={caseId} />}
+      {caseId ? (
+        <input type="hidden" name="case_id" value={caseId} />
+      ) : (
+        cases &&
+        cases.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor={`${uid}-case_id`}>Link to a case</Label>
+            <MemoryCaseSelect id={`${uid}-case_id`} cases={cases} />
+          </div>
+        )
+      )}
       <div className="flex flex-col gap-2">
         <Label htmlFor={`${uid}-content`}>What did you learn?</Label>
         <Textarea

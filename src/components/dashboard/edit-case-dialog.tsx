@@ -23,19 +23,36 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CaseClosingReflectionDialog } from "@/components/dashboard/case-closing-reflection-dialog";
-import type { Case } from "@/lib/types";
+import type { Case, CaseStatus } from "@/lib/types";
+
+const NATURE_OF_DECISION_OPTIONS = ["Judgment", "Order", "Decree", "Settlement", "Withdrawn"];
 
 export function EditCaseDialog({ caseItem }: { caseItem: Case }) {
   const [open, setOpen] = useState(false);
   const [reflectionOpen, setReflectionOpen] = useState(false);
+  const [status, setStatus] = useState<CaseStatus>(caseItem.status);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  // A case saved before "Other" existed (or before this was a select at all)
+  // may already hold a nature-of-decision value outside the fixed list —
+  // treat that as "Other" with its own text preserved, not silently dropped.
+  const isCustomNature =
+    !!caseItem.decision_nature && !NATURE_OF_DECISION_OPTIONS.includes(caseItem.decision_nature);
+  const [natureSelection, setNatureSelection] = useState<string>(
+    isCustomNature ? "Other" : (caseItem.decision_nature ?? ""),
+  );
+
+  // Decision fields (date decided, nature, outcome) only make sense once a
+  // case has actually been decided — surfacing them for an Ongoing matter is
+  // just noise. They stay visible through Archived too, since archiving
+  // happens after disposal, not instead of it.
+  const showDecisionSection = status !== "ongoing";
+
+  function handleSubmit() {
     // Doesn't preventDefault — the form's own `action={updateCase}` still
     // submits normally. This just separately notices a same-submission
     // ongoing/archived -> disposed transition, so the reflection prompt can
     // follow it without waiting on (or being coupled to) that server round trip.
-    const newStatus = new FormData(e.currentTarget).get("status");
-    if (caseItem.status !== "disposed" && newStatus === "disposed") {
+    if (caseItem.status !== "disposed" && status === "disposed") {
       setReflectionOpen(true);
     }
     setOpen(false);
@@ -93,7 +110,7 @@ export function EditCaseDialog({ caseItem }: { caseItem: Case }) {
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="edit-status">Status</Label>
-              <Select name="status" defaultValue={caseItem.status}>
+              <Select value={status} onValueChange={(v) => setStatus(v as CaseStatus)}>
                 <SelectTrigger id="edit-status" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -103,7 +120,96 @@ export function EditCaseDialog({ caseItem }: { caseItem: Case }) {
                   <SelectItem value="archived">Archived</SelectItem>
                 </SelectContent>
               </Select>
+              {/* A plain hidden input, not Select's own name prop — status is
+                  tracked in React state (it drives the Decision section's
+                  visibility below), so this just mirrors that state for submission. */}
+              <input type="hidden" name="status" value={status} />
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="edit-stage">Stage</Label>
+                <Input
+                  id="edit-stage"
+                  name="stage"
+                  defaultValue={caseItem.stage ?? ""}
+                  placeholder="e.g. Evidence"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="edit-next_hearing_date">Next hearing</Label>
+                <Input
+                  id="edit-next_hearing_date"
+                  name="next_hearing_date"
+                  type="date"
+                  defaultValue={caseItem.next_hearing_date ?? ""}
+                />
+              </div>
+            </div>
+            {showDecisionSection ? (
+              <div className="flex flex-col gap-3 rounded-lg border p-3">
+                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  Decision
+                </p>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="edit-decided_on">Judgement / Order date</Label>
+                  <Input
+                    id="edit-decided_on"
+                    name="decided_on"
+                    type="date"
+                    defaultValue={caseItem.decided_on ?? ""}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="edit-decision_nature">Nature of decision</Label>
+                    <Select value={natureSelection || undefined} onValueChange={setNatureSelection}>
+                      <SelectTrigger id="edit-decision_nature" className="w-full">
+                        <SelectValue placeholder="Select…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {NATURE_OF_DECISION_OPTIONS.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {/* Controlled (to react to "Other"), so it needs its own
+                        field for submission rather than Select's name prop —
+                        see the conditional decision_nature input below. */}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="edit-decision_outcome">Outcome</Label>
+                    <Input
+                      id="edit-decision_outcome"
+                      name="decision_outcome"
+                      defaultValue={caseItem.decision_outcome ?? ""}
+                      placeholder="e.g. Favourable, Unfavourable"
+                    />
+                  </div>
+                </div>
+                {natureSelection === "Other" ? (
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="edit-decision_nature_other">Specify nature of decision</Label>
+                    <Input
+                      id="edit-decision_nature_other"
+                      name="decision_nature"
+                      defaultValue={isCustomNature ? (caseItem.decision_nature ?? "") : ""}
+                      placeholder="e.g. Compromise decree"
+                    />
+                  </div>
+                ) : (
+                  <input type="hidden" name="decision_nature" value={natureSelection} />
+                )}
+              </div>
+            ) : (
+              <>
+                <input type="hidden" name="decided_on" value={caseItem.decided_on ?? ""} />
+                <input type="hidden" name="decision_nature" value={caseItem.decision_nature ?? ""} />
+                <input type="hidden" name="decision_outcome" value={caseItem.decision_outcome ?? ""} />
+              </>
+            )}
             <div className="flex flex-col gap-2">
               <Label htmlFor="edit-summary">Summary</Label>
               <Textarea id="edit-summary" name="summary" rows={3} defaultValue={caseItem.summary ?? ""} />

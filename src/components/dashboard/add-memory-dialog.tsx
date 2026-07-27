@@ -15,9 +15,11 @@ import {
 export function AddMemoryDialog({
   open,
   onOpenChange,
+  cases,
 }: {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  cases?: { id: string; title: string }[];
 } = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
@@ -38,7 +40,7 @@ export function AddMemoryDialog({
             A quick note — no case required. Link it to a case later if it turns out to matter.
           </DialogDescription>
         </DialogHeader>
-        <AddMemoryForm onSubmit={() => setDialogOpen(false)} />
+        <AddMemoryForm cases={cases} onSubmit={() => setDialogOpen(false)} />
       </DialogContent>
     </Dialog>
   );

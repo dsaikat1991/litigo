@@ -27,27 +27,64 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { updateMemory, deleteMemory } from "@/lib/actions/memories";
-import { formatDate, formatDateTime, previewText } from "@/lib/utils";
 import { MemoryCaseSelect } from "@/components/dashboard/memory-case-select";
-import type { Memory } from "@/lib/types";
+import { updateMemory, deleteMemory } from "@/lib/actions/memories";
+import { formatDate, formatDateTime } from "@/lib/utils";
+import type { RecentActivityItem } from "@/lib/data/dashboard";
 
-export function MemoryList({
-  memories,
-  cases = [],
-  showCaseLink = false,
-  emptyLabel = "No memories yet.",
+const TYPE_LABEL: Record<RecentActivityItem["type"], string> = {
+  argument: "Argument",
+  research: "Research",
+  lesson: "Lesson",
+  strategy: "Strategy",
+  memory: "Memory",
+};
+
+const TYPE_VARIANT: Record<RecentActivityItem["type"], "outline" | "verified"> = {
+  argument: "outline",
+  research: "outline",
+  lesson: "verified",
+  strategy: "outline",
+  memory: "outline",
+};
+
+// Arguments/research only ever exist inside a case — there's no standalone
+// view for them, so the whole point of clicking is to jump to that case.
+// Memories can stand alone, so clicking one opens a quick preview (with full
+// edit/delete) instead of navigating away.
+function isCaseScoped(type: RecentActivityItem["type"]): boolean {
+  return type === "argument" || type === "research";
+}
+
+function ActivityRow({ item, locale, timeZone }: { item: RecentActivityItem; locale: string; timeZone: string }) {
+  return (
+    <div className="flex items-start gap-3 py-2.5">
+      <Badge variant={TYPE_VARIANT[item.type]} className="mt-0.5 shrink-0 font-normal">
+        {TYPE_LABEL[item.type]}
+      </Badge>
+      <div className="min-w-0 flex-1">
+        <p className="line-clamp-1 text-sm">{item.content}</p>
+        <p className="text-muted-foreground mt-0.5 text-xs">
+          {item.caseTitle ?? "Not linked to a case"}
+        </p>
+        <p className="text-muted-foreground text-xs">{formatDate(item.createdAt, locale, timeZone)}</p>
+      </div>
+    </div>
+  );
+}
+
+export function RecentActivityPanel({
+  items,
+  cases,
   locale,
   timeZone,
 }: {
-  memories: Memory[];
-  cases?: { id: string; title: string }[];
-  showCaseLink?: boolean;
-  emptyLabel?: string;
+  items: RecentActivityItem[];
+  cases: { id: string; title: string }[];
   locale: string;
   timeZone: string;
 }) {
-  const [selected, setSelected] = useState<Memory | null>(null);
+  const [selected, setSelected] = useState<RecentActivityItem | null>(null);
   const [editing, setEditing] = useState(false);
 
   function closeDialog(open: boolean) {
@@ -57,51 +94,41 @@ export function MemoryList({
     }
   }
 
-  if (memories.length === 0) {
-    return <p className="text-sm text-muted-foreground">{emptyLabel}</p>;
-  }
+  if (items.length === 0) return null;
 
   return (
-    <>
-      <div className="flex flex-col gap-3">
-        {memories.map((memory) => (
-          <button
-            key={memory.id}
-            type="button"
-            onClick={() => {
-              setSelected(memory);
-              setEditing(false);
-            }}
-            className="flex cursor-pointer flex-col gap-2 rounded-lg border p-4 text-left transition-colors hover:bg-accent/50"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-medium">{previewText(memory.content)}</p>
-              <span className="shrink-0 text-xs text-muted-foreground">
-                {formatDate(memory.created_at, locale, timeZone)}
-              </span>
-            </div>
-            {(memory.tags.length > 0 || (showCaseLink && memory.case_id && memory.case)) && (
-              <div className="flex flex-wrap items-center gap-1.5">
-                {memory.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="font-normal">
-                    {tag}
-                  </Badge>
-                ))}
-                {showCaseLink && memory.case_id && memory.case && (
-                  <Link
-                    href={`/dashboard/cases/${memory.case_id}`}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Badge variant="verified" className="font-normal">
-                      {memory.case.title}
-                    </Badge>
-                  </Link>
-                )}
-              </div>
-            )}
-          </button>
-        ))}
+    <div className="rounded-xl border p-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-heading text-sm font-medium">Recent memory</h2>
+        <Link href="/dashboard/memories" className="text-muted-foreground hover:text-foreground text-xs">
+          View all
+        </Link>
       </div>
+      <ul className="mt-1 flex flex-col divide-y">
+        {items.map((item) => (
+          <li key={`${item.type}-${item.id}`}>
+            {isCaseScoped(item.type) && item.caseId ? (
+              <Link
+                href={`/dashboard/cases/${item.caseId}`}
+                className="hover:bg-accent/50 -mx-1 block rounded-lg px-1"
+              >
+                <ActivityRow item={item} locale={locale} timeZone={timeZone} />
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelected(item);
+                  setEditing(false);
+                }}
+                className="hover:bg-accent/50 -mx-1 block w-[calc(100%+0.5rem)] cursor-pointer rounded-lg px-1 text-left"
+              >
+                <ActivityRow item={item} locale={locale} timeZone={timeZone} />
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
 
       <Dialog open={!!selected} onOpenChange={closeDialog}>
         <DialogContent className="sm:max-w-lg" showCloseButton={false}>
@@ -123,15 +150,15 @@ export function MemoryList({
                 className="flex flex-col gap-3"
               >
                 <input type="hidden" name="id" value={selected.id} />
-                <input type="hidden" name="previous_case_id" value={selected.case_id ?? ""} />
+                <input type="hidden" name="previous_case_id" value={selected.caseId ?? ""} />
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="edit-memory-case">Linked case</Label>
-                  <MemoryCaseSelect id="edit-memory-case" cases={cases} defaultValue={selected.case_id} />
+                  <Label htmlFor="recent-memory-case">Linked case</Label>
+                  <MemoryCaseSelect id="recent-memory-case" cases={cases} defaultValue={selected.caseId} />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="edit-memory-content">What did you learn?</Label>
+                  <Label htmlFor="recent-memory-content">What did you learn?</Label>
                   <Textarea
-                    id="edit-memory-content"
+                    id="recent-memory-content"
                     name="content"
                     rows={4}
                     required
@@ -139,9 +166,9 @@ export function MemoryList({
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="edit-memory-tags">Tags</Label>
+                  <Label htmlFor="recent-memory-tags">Tags</Label>
                   <Input
-                    id="edit-memory-tags"
+                    id="recent-memory-tags"
                     name="tags"
                     defaultValue={selected.tags.join(", ")}
                     placeholder="comma-separated"
@@ -158,7 +185,14 @@ export function MemoryList({
             <>
               <DialogHeader>
                 <div className="flex items-start justify-between gap-2">
-                  <DialogTitle>Memory</DialogTitle>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={TYPE_VARIANT[selected.type]} className="font-normal">
+                      {TYPE_LABEL[selected.type]}
+                    </Badge>
+                    <DialogTitle className="text-base">
+                      {selected.caseTitle ?? "Not linked to a case"}
+                    </DialogTitle>
+                  </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <Button
                       type="button"
@@ -184,8 +218,8 @@ export function MemoryList({
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <form action={deleteMemory} onSubmit={() => closeDialog(false)}>
                             <input type="hidden" name="id" value={selected.id} />
-                            {selected.case_id && (
-                              <input type="hidden" name="case_id" value={selected.case_id} />
+                            {selected.caseId && (
+                              <input type="hidden" name="case_id" value={selected.caseId} />
                             )}
                             <AlertDialogAction type="submit" variant="destructive">
                               Delete
@@ -202,25 +236,18 @@ export function MemoryList({
                   </div>
                 </div>
                 <DialogDescription>
-                  {formatDateTime(selected.created_at, locale, timeZone)}
+                  {formatDateTime(selected.createdAt, locale, timeZone)}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col gap-3">
                 <p className="text-sm whitespace-pre-wrap">{selected.content}</p>
-                {(selected.tags.length > 0 || (selected.case_id && selected.case)) && (
+                {selected.tags.length > 0 && (
                   <div className="flex flex-wrap items-center gap-1.5">
                     {selected.tags.map((tag) => (
                       <Badge key={tag} variant="outline" className="font-normal">
                         {tag}
                       </Badge>
                     ))}
-                    {selected.case_id && selected.case && (
-                      <Link href={`/dashboard/cases/${selected.case_id}`}>
-                        <Badge variant="verified" className="font-normal">
-                          {selected.case.title}
-                        </Badge>
-                      </Link>
-                    )}
                   </div>
                 )}
               </div>
@@ -228,6 +255,6 @@ export function MemoryList({
           )}
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

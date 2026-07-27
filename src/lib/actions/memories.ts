@@ -11,6 +11,14 @@ function parseTags(raw: string): string[] {
     .filter(Boolean);
 }
 
+// The case picker submits the sentinel "none" for "no case" — Radix Select
+// items can't carry an empty-string value, so this is where that sentinel
+// gets translated back to a real null.
+function parseCaseId(raw: FormDataEntryValue | null): string | null {
+  const value = String(raw ?? "");
+  return value && value !== "none" ? value : null;
+}
+
 export async function createMemory(formData: FormData) {
   const content = String(formData.get("content") ?? "").trim();
   if (!content) return;
@@ -21,7 +29,7 @@ export async function createMemory(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const caseId = String(formData.get("case_id") ?? "") || null;
+  const caseId = parseCaseId(formData.get("case_id"));
 
   await supabase.from("memories").insert({
     owner_id: user.id,
@@ -45,18 +53,21 @@ export async function updateMemory(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const caseId = String(formData.get("case_id") ?? "") || null;
+  const caseId = parseCaseId(formData.get("case_id"));
+  const previousCaseId = parseCaseId(formData.get("previous_case_id"));
 
   await supabase
     .from("memories")
     .update({
       content,
+      case_id: caseId,
       tags: parseTags(String(formData.get("tags") ?? "")),
     })
     .eq("id", id);
 
   revalidatePath("/dashboard");
   if (caseId) revalidatePath(`/dashboard/cases/${caseId}`);
+  if (previousCaseId && previousCaseId !== caseId) revalidatePath(`/dashboard/cases/${previousCaseId}`);
 }
 
 export async function deleteMemory(formData: FormData) {

@@ -67,6 +67,16 @@ export function NewCaseDialog({
               <Input id={`${uid}-parties`} name="parties" />
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor={`${uid}-stage`}>Stage</Label>
+              <Input id={`${uid}-stage`} name="stage" placeholder="e.g. Evidence" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor={`${uid}-next_hearing_date`}>Next hearing</Label>
+              <Input id={`${uid}-next_hearing_date`} name="next_hearing_date" type="date" />
+            </div>
+          </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor={`${uid}-summary`}>Summary</Label>
             <Textarea id={`${uid}-summary`} name="summary" rows={3} />

@@ -142,6 +142,17 @@
   animation: caret-blink 1.1s step-end infinite;
 }
 
+/* Keeps a container scrollable without a visible scrollbar — used on rounded
+   containers (e.g. dialogs) where a native scrollbar sits flush against the
+   edge and visually squares off the rounded corner it should follow. */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-caret-blink {
     animation: none;

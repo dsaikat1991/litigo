@@ -136,7 +136,7 @@ export function CommandPalette({ cases }: { cases: { id: string; title: string }
       </CommandDialog>
 
       <NewCaseDialog open={newCaseOpen} onOpenChange={setNewCaseOpen} />
-      <AddMemoryDialog open={addMemoryOpen} onOpenChange={setAddMemoryOpen} />
+      <AddMemoryDialog open={addMemoryOpen} onOpenChange={setAddMemoryOpen} cases={cases} />
     </>
   );
 }

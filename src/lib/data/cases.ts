@@ -94,6 +94,15 @@ export async function getCaseById(id: string): Promise<Case | null> {
   return data;
 }
 
+// Lightweight id/title pairs for case pickers (linking a memory to a case,
+// jumping to a case from the command palette) — not a full Case fetch.
+export async function getCaseOptions(): Promise<{ id: string; title: string }[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("cases").select("id, title").order("title");
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function getArgumentNotes(caseId: string): Promise<ArgumentNote[]> {
   const supabase = await createClient();
   const { data, error } = await supabase

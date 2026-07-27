@@ -12,6 +12,11 @@ export interface Case {
   case_type: string | null;
   parties: string | null;
   status: CaseStatus;
+  stage: string | null;
+  next_hearing_date: string | null;
+  decided_on: string | null;
+  decision_nature: string | null;
+  decision_outcome: string | null;
   summary: string | null;
   tags: string[];
   created_at: string;

@@ -8,7 +8,9 @@ export default function Home() {
     <div className="flex flex-1 flex-col">
       <header className="border-b">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-8">
-          <Logo />
+          <Link href="/">
+            <Logo />
+          </Link>
           <nav className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
               <Link href="/login">Sign in</Link>

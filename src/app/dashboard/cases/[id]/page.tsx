@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getArgumentNotes, getCaseById, getResearchNotes } from "@/lib/data/cases";
+import { getArgumentNotes, getCaseById, getCaseOptions, getResearchNotes } from "@/lib/data/cases";
 import { getMemories } from "@/lib/data/memories";
 import { getCurrentProfile } from "@/lib/data/profile";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import { ArgumentNoteList, ResearchNoteList } from "@/components/dashboard/note-
 import { MemoryList } from "@/components/dashboard/memory-list";
 import { EditCaseDialog } from "@/components/dashboard/edit-case-dialog";
 import { DeleteCaseButton } from "@/components/dashboard/delete-case-button";
-import { formatDate } from "@/lib/utils";
+import { caseStatusBadgeVariant, formatDate } from "@/lib/utils";
 
 export default async function CaseDetailPage({
   params,
@@ -22,11 +22,12 @@ export default async function CaseDetailPage({
   const caseItem = await getCaseById(id);
   if (!caseItem) notFound();
 
-  const [argumentNotes, researchNotes, memories, profile] = await Promise.all([
+  const [argumentNotes, researchNotes, memories, profile, caseOptions] = await Promise.all([
     getArgumentNotes(id),
     getResearchNotes(id),
     getMemories({ caseId: id }),
     getCurrentProfile(),
+    getCaseOptions(),
   ]);
   const locale = profile?.locale ?? "en-IN";
   const timeZone = profile?.timezone ?? "Asia/Kolkata";
@@ -37,7 +38,7 @@ export default async function CaseDetailPage({
         <div className="flex items-center justify-between gap-2">
           <h1 className="font-heading text-lg font-medium">{caseItem.title}</h1>
           <div className="flex shrink-0 items-center gap-2">
-            <Badge variant="secondary" className="capitalize">
+            <Badge variant={caseStatusBadgeVariant(caseItem.status)} className="capitalize">
               {caseItem.status}
             </Badge>
             <EditCaseDialog caseItem={caseItem} />
@@ -84,6 +85,7 @@ export default async function CaseDetailPage({
           <AddMemoryForm caseId={id} />
           <MemoryList
             memories={memories}
+            cases={caseOptions}
             emptyLabel="No memories saved on this case yet."
             locale={locale}
             timeZone={timeZone}

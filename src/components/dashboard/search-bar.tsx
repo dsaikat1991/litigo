@@ -38,7 +38,7 @@ export function SearchBar({
   basePath = "/dashboard",
   scope = "all",
   showCommandPaletteHint = true,
-  placeholder = "Search your legal memory…",
+  placeholder = "Search cases, arguments, research, parties or past strategies…",
 }: {
   defaultValue: string;
   exampleQueries?: string[];
@@ -244,12 +244,6 @@ export function SearchBar({
           </div>
         )}
       </form>
-
-      <div className="flex items-center justify-end px-1">
-        <span className="text-verified shrink-0 text-xs font-medium" aria-disabled>
-          Advanced search
-        </span>
-      </div>
     </div>
   );
 }

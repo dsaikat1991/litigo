@@ -12,6 +12,11 @@ function parseTags(raw: string): string[] {
     .filter(Boolean);
 }
 
+function parseDate(raw: FormDataEntryValue | null): string | null {
+  const value = String(raw ?? "").trim();
+  return value || null;
+}
+
 export async function createCase(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -32,6 +37,11 @@ export async function createCase(formData: FormData) {
       case_type: String(formData.get("case_type") ?? "") || null,
       parties: String(formData.get("parties") ?? "") || null,
       status: (String(formData.get("status") ?? "ongoing") as CaseStatus),
+      stage: String(formData.get("stage") ?? "") || null,
+      next_hearing_date: parseDate(formData.get("next_hearing_date")),
+      decided_on: parseDate(formData.get("decided_on")),
+      decision_nature: String(formData.get("decision_nature") ?? "") || null,
+      decision_outcome: String(formData.get("decision_outcome") ?? "") || null,
       summary: String(formData.get("summary") ?? "") || null,
       tags: parseTags(String(formData.get("tags") ?? "")),
     })
@@ -66,6 +76,11 @@ export async function updateCase(formData: FormData) {
       case_type: String(formData.get("case_type") ?? "") || null,
       parties: String(formData.get("parties") ?? "") || null,
       status: (String(formData.get("status") ?? "ongoing") as CaseStatus),
+      stage: String(formData.get("stage") ?? "") || null,
+      next_hearing_date: parseDate(formData.get("next_hearing_date")),
+      decided_on: parseDate(formData.get("decided_on")),
+      decision_nature: String(formData.get("decision_nature") ?? "") || null,
+      decision_outcome: String(formData.get("decision_outcome") ?? "") || null,
       summary: String(formData.get("summary") ?? "") || null,
       tags: parseTags(String(formData.get("tags") ?? "")),
     })
