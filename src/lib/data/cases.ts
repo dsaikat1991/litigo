@@ -49,21 +49,23 @@ export async function getCases(search?: string, status?: CaseStatus): Promise<Ca
   }
 
   // A case matches if the case record itself matches, or if any of its
-  // argument/research notes or linked memories match — the whole point is
-  // finding a case again via a point you argued or researched, not just its
-  // title/summary.
+  // argument/research notes, linked memories, or timeline/hearing events
+  // match — the whole point is finding a case again via a point you argued,
+  // researched, or recorded at a hearing, not just its title/summary.
   const pattern = `%${trimmed}%`;
-  const [caseMatches, argumentMatches, researchMatches, memoryMatches] = await Promise.all([
+  const [caseMatches, argumentMatches, researchMatches, memoryMatches, eventMatches] = await Promise.all([
     supabase.from("cases").select("id").ilike("search_text", pattern),
     supabase.from("argument_notes").select("case_id").ilike("search_text", pattern),
     supabase.from("research_notes").select("case_id").ilike("search_text", pattern),
     supabase.from("memories").select("case_id").not("case_id", "is", null).ilike("search_text", pattern),
+    supabase.from("case_events").select("case_id").ilike("search_text", pattern),
   ]);
 
   if (caseMatches.error) throw caseMatches.error;
   if (argumentMatches.error) throw argumentMatches.error;
   if (researchMatches.error) throw researchMatches.error;
   if (memoryMatches.error) throw memoryMatches.error;
+  if (eventMatches.error) throw eventMatches.error;
 
   const matchingIds = Array.from(
     new Set([
@@ -71,6 +73,7 @@ export async function getCases(search?: string, status?: CaseStatus): Promise<Ca
       ...argumentMatches.data.map((n) => n.case_id),
       ...researchMatches.data.map((n) => n.case_id),
       ...memoryMatches.data.map((n) => n.case_id as string),
+      ...eventMatches.data.map((e) => e.case_id),
     ]),
   );
 

@@ -1,10 +1,8 @@
 "use client";
 
-import { Bell } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/lib/actions/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,10 +23,6 @@ export function HeaderProfileMenu({
 }) {
   return (
     <div className="flex items-center gap-1">
-      {/* No notifications feature yet — present but inert rather than faking activity. */}
-      <Button variant="ghost" size="icon" aria-label="Notifications (coming soon)">
-        <Bell />
-      </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="ml-1 cursor-pointer rounded-full outline-none select-none focus-visible:ring-2 focus-visible:ring-ring">

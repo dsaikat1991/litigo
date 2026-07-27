@@ -130,6 +130,10 @@
   }
   html {
     @apply font-sans;
+    /* Reserves scrollbar space unconditionally, so switching to a shorter
+       tab (e.g. an empty Timeline) never removes the scrollbar and shifts
+       the whole page horizontally — the classic scrollbar-layout-shift bug. */
+    scrollbar-gutter: stable;
   }
 }
 

@@ -145,20 +145,22 @@ export default async function DashboardPage({
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.55fr_1fr]">
           <div className="flex flex-col gap-6">
             <section className="flex flex-col gap-3.5">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <Briefcase className="text-muted-foreground size-4" />
-                  <h2 className="font-heading text-sm font-medium">Continue working</h2>
+              {cases.length > 0 && (
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="text-muted-foreground size-4" />
+                    <h2 className="font-heading text-sm font-medium">Continue working</h2>
+                  </div>
+                  {cases.length > continueWorkingCases.length && (
+                    <Link
+                      href="/dashboard/cases"
+                      className="text-muted-foreground hover:text-foreground text-xs"
+                    >
+                      View all
+                    </Link>
+                  )}
                 </div>
-                {cases.length > continueWorkingCases.length && (
-                  <Link
-                    href="/dashboard/cases"
-                    className="text-muted-foreground hover:text-foreground text-xs"
-                  >
-                    View all
-                  </Link>
-                )}
-              </div>
+              )}
               {cases.length === 0 ? (
                 <EmptyStatePanel
                   icon={FolderPlus}

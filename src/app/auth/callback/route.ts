@@ -13,13 +13,20 @@ export async function GET(request: NextRequest) {
       if (next) {
         return NextResponse.redirect(`${origin}${next}`);
       }
-      // No explicit destination (the OAuth path, not the password-reset
-      // path) — a just-created account has no onboarding data yet, so send
-      // first-time sign-ins there instead of straight to the dashboard.
-      const justCreated =
-        Date.now() - new Date(data.user.created_at).getTime() < 60_000;
+      // No explicit destination (the OAuth or email-confirmation path, not
+      // password reset) — send anyone who hasn't been through onboarding
+      // step 1 there instead of the dashboard. Not time-based: an email
+      // confirmation can be clicked minutes or hours after signup, so
+      // "created in the last N seconds" can't reliably tell first-time
+      // sign-ins apart from returning ones the way it can for OAuth.
+      const { data: licence } = await supabase
+        .from("professional_licences")
+        .select("id")
+        .eq("user_id", data.user.id)
+        .eq("is_primary", true)
+        .maybeSingle();
       return NextResponse.redirect(
-        `${origin}${justCreated ? "/onboarding/personalize" : "/dashboard"}`,
+        `${origin}${licence ? "/dashboard" : "/onboarding/personalize"}`,
       );
     }
   }

@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Folder, Sparkles, UserRound, Settings } from "lucide-react";
+import { Home, Folder, CalendarDays, Sparkles, UserRound, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Home", icon: Home, exact: true },
   { href: "/dashboard/cases", label: "Cases", icon: Folder, exact: false },
+  { href: "/dashboard/diary", label: "Court Diary", icon: CalendarDays, exact: false },
   { href: "/dashboard/memories", label: "Memories", icon: Sparkles, exact: false },
   { href: "/dashboard/profile", label: "Profile", icon: UserRound, exact: false },
   { href: "/dashboard/settings", label: "Settings", icon: Settings, exact: false },

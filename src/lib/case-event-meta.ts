@@ -1,0 +1,65 @@
+import {
+  ArrowUpCircle,
+  Award,
+  Bell,
+  BookOpen,
+  CalendarClock,
+  CheckSquare,
+  FileInput,
+  Flag,
+  Gavel,
+  Handshake,
+  ScrollText,
+  StickyNote,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+import type { CaseEventType } from "@/lib/types";
+
+export const CASE_EVENT_TYPES: CaseEventType[] = [
+  "hearing",
+  "filing",
+  "order",
+  "judgment",
+  "adjournment",
+  "evidence",
+  "notice",
+  "compliance",
+  "settlement",
+  "appeal",
+  "execution",
+  "internal_note",
+  "case_disposal",
+];
+
+export const CASE_EVENT_TYPE_LABELS: Record<CaseEventType, string> = {
+  hearing: "Hearing",
+  filing: "Filing",
+  order: "Order",
+  judgment: "Judgment",
+  adjournment: "Adjournment",
+  evidence: "Evidence",
+  notice: "Notice",
+  compliance: "Compliance",
+  settlement: "Settlement",
+  appeal: "Appeal",
+  execution: "Execution",
+  internal_note: "Internal note",
+  case_disposal: "Case disposal",
+};
+
+export const CASE_EVENT_TYPE_ICONS: Record<CaseEventType, LucideIcon> = {
+  hearing: Gavel,
+  filing: FileInput,
+  order: ScrollText,
+  judgment: Award,
+  adjournment: CalendarClock,
+  evidence: BookOpen,
+  notice: Bell,
+  compliance: CheckSquare,
+  settlement: Handshake,
+  appeal: ArrowUpCircle,
+  execution: Zap,
+  internal_note: StickyNote,
+  case_disposal: Flag,
+};

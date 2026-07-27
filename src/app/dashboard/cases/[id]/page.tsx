@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import { CalendarClock, Milestone } from "lucide-react";
 import { getArgumentNotes, getCaseById, getCaseOptions, getResearchNotes } from "@/lib/data/cases";
+import { getCaseEvents } from "@/lib/data/case-events";
 import { getMemories } from "@/lib/data/memories";
 import { getCurrentProfile } from "@/lib/data/profile";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +11,8 @@ import { AddResearchNoteForm } from "@/components/dashboard/add-research-note-fo
 import { AddMemoryForm } from "@/components/dashboard/add-memory-form";
 import { ArgumentNoteList, ResearchNoteList } from "@/components/dashboard/note-list";
 import { MemoryList } from "@/components/dashboard/memory-list";
+import { CaseTimeline } from "@/components/dashboard/case-timeline";
+import { RecordHearingDialog } from "@/components/dashboard/record-hearing-dialog";
 import { EditCaseDialog } from "@/components/dashboard/edit-case-dialog";
 import { DeleteCaseButton } from "@/components/dashboard/delete-case-button";
 import { caseStatusBadgeVariant, formatDate } from "@/lib/utils";
@@ -22,12 +26,13 @@ export default async function CaseDetailPage({
   const caseItem = await getCaseById(id);
   if (!caseItem) notFound();
 
-  const [argumentNotes, researchNotes, memories, profile, caseOptions] = await Promise.all([
+  const [argumentNotes, researchNotes, memories, profile, caseOptions, caseEvents] = await Promise.all([
     getArgumentNotes(id),
     getResearchNotes(id),
     getMemories({ caseId: id }),
     getCurrentProfile(),
     getCaseOptions(),
+    getCaseEvents(id),
   ]);
   const locale = profile?.locale ?? "en-IN";
   const timeZone = profile?.timezone ?? "Asia/Kolkata";
@@ -41,6 +46,7 @@ export default async function CaseDetailPage({
             <Badge variant={caseStatusBadgeVariant(caseItem.status)} className="capitalize">
               {caseItem.status}
             </Badge>
+            <RecordHearingDialog caseId={caseItem.id} caseTitle={caseItem.title} triggerVariant="default" />
             <EditCaseDialog caseItem={caseItem} />
             <DeleteCaseButton caseId={caseItem.id} title={caseItem.title} />
           </div>
@@ -50,6 +56,22 @@ export default async function CaseDetailPage({
             .filter(Boolean)
             .join(" · ")}
         </p>
+        {(caseItem.stage || caseItem.next_hearing_date) && (
+          <div className="flex flex-wrap items-center gap-4 text-xs">
+            {caseItem.stage && (
+              <span className="text-muted-foreground flex items-center gap-1">
+                <Milestone className="size-3" />
+                {caseItem.stage}
+              </span>
+            )}
+            {caseItem.next_hearing_date && (
+              <span className="text-muted-foreground flex items-center gap-1">
+                <CalendarClock className="size-3" />
+                Next hearing {formatDate(caseItem.next_hearing_date, locale, timeZone)}
+              </span>
+            )}
+          </div>
+        )}
         <p className="text-xs text-muted-foreground">
           Created {formatDate(caseItem.created_at, locale, timeZone)}
           {caseItem.updated_at !== caseItem.created_at &&
@@ -67,12 +89,16 @@ export default async function CaseDetailPage({
         )}
       </div>
 
-      <Tabs defaultValue="arguments">
+      <Tabs defaultValue="timeline">
         <TabsList>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="arguments">Arguments</TabsTrigger>
           <TabsTrigger value="research">Research</TabsTrigger>
           <TabsTrigger value="memory">Memory</TabsTrigger>
         </TabsList>
+        <TabsContent value="timeline" className="flex flex-col gap-4">
+          <CaseTimeline events={caseEvents} locale={locale} timeZone={timeZone} />
+        </TabsContent>
         <TabsContent value="arguments" className="flex flex-col gap-4">
           <AddArgumentNoteForm caseId={id} />
           <ArgumentNoteList notes={argumentNotes} locale={locale} timeZone={timeZone} />

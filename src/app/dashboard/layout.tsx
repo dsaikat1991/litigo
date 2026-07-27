@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/data/profile";
+import { getDueInAppNotifications } from "@/lib/data/case-events";
 import { getInitials } from "@/lib/utils";
 import { HeaderProfileMenu } from "@/components/dashboard/header-profile-menu";
+import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Logo } from "@/components/logo";
 
@@ -14,6 +16,10 @@ export default async function DashboardLayout({
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
 
+  const locale = profile.locale ?? "en-IN";
+  const timeZone = profile.timezone ?? "Asia/Kolkata";
+  const notifications = await getDueInAppNotifications(timeZone);
+
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <header className="border-b">
@@ -21,11 +27,14 @@ export default async function DashboardLayout({
           <Link href="/dashboard">
             <Logo />
           </Link>
-          <HeaderProfileMenu
-            initials={getInitials(profile.fullName, profile.email)}
-            fullName={profile.fullName}
-            email={profile.email}
-          />
+          <div className="flex items-center gap-1">
+            <NotificationBell notifications={notifications} locale={locale} timeZone={timeZone} />
+            <HeaderProfileMenu
+              initials={getInitials(profile.fullName, profile.email)}
+              fullName={profile.fullName}
+              email={profile.email}
+            />
+          </div>
         </div>
       </header>
       <div className="flex flex-1">

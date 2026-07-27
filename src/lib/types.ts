@@ -3,6 +3,25 @@ export type NoteOutcome = "worked" | "failed" | "untested";
 export type ResearchSourceType = "statute" | "judgment" | "article" | "other";
 export type LicenceVerificationStatus = "unverified" | "pending" | "verified" | "rejected";
 
+export type CaseEventType =
+  | "hearing"
+  | "filing"
+  | "order"
+  | "judgment"
+  | "adjournment"
+  | "evidence"
+  | "notice"
+  | "compliance"
+  | "settlement"
+  | "appeal"
+  | "execution"
+  | "internal_note"
+  | "case_disposal";
+
+export type NotificationTiming = "7_day" | "3_day" | "1_day" | "same_day";
+export type NotificationChannel = "in_app" | "email";
+export type NotificationStatus = "pending" | "sent" | "cancelled";
+
 export interface Case {
   id: string;
   owner_id: string;
@@ -59,6 +78,71 @@ export interface Memory {
   created_at: string;
   updated_at: string;
   case?: { title: string } | null;
+}
+
+export interface HearingTask {
+  id: string;
+  case_id: string;
+  event_id: string;
+  owner_id: string;
+  description: string;
+  is_done: boolean;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface HearingDocument {
+  id: string;
+  case_id: string;
+  event_id: string;
+  owner_id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface CaseEvent {
+  id: string;
+  case_id: string;
+  owner_id: string;
+  event_type: CaseEventType;
+  event_date: string;
+  title: string;
+  description: string | null;
+  stage: string | null;
+  hearing_purpose: string | null;
+  arguments_made: string | null;
+  court_direction: string | null;
+  next_hearing_date: string | null;
+  next_hearing_purpose: string | null;
+  created_at: string;
+  updated_at: string;
+  tasks?: HearingTask[];
+  documents?: HearingDocument[];
+  case?: { title: string; court: string | null } | null;
+}
+
+export interface NotificationSchedule {
+  id: string;
+  case_id: string;
+  event_id: string;
+  owner_id: string;
+  hearing_date: string;
+  timing: NotificationTiming;
+  channel: NotificationChannel;
+  remind_at: string;
+  status: NotificationStatus;
+  read_at: string | null;
+  created_at: string;
+  sent_at: string | null;
+  case?: { title: string; court: string | null } | null;
+}
+
+// Upcoming/past hearing rows for the Court Diary — a case joined with the
+// most recent case_event (for purpose/stage context) and its open tasks.
+export interface HearingDiaryEntry {
+  case: Case;
+  latestEvent: CaseEvent | null;
+  pendingTasks: HearingTask[];
 }
 
 export interface ProfessionalLicence {

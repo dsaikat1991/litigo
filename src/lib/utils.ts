@@ -52,6 +52,30 @@ export function formatDateTime(iso: string, locale: string, timeZone: string): s
   });
 }
 
+// YYYY-MM-DD for the viewer's own calendar day — used for date-only (not
+// timestamptz) comparisons like "is this hearing today", where a raw UTC
+// day-boundary would be wrong for part of the day in Asia/Kolkata (UTC+5:30).
+export function dateKeyInTimeZone(date: Date, timeZone: string): string {
+  return date.toLocaleDateString("en-CA", { timeZone });
+}
+
+// Pure day-count arithmetic on a YYYY-MM-DD key. Treats the key as UTC
+// midnight only for the addition itself (never converted back to a real
+// zoned instant), so this is safe even though dateKeyInTimeZone above is
+// zone-aware — we're just counting whole days, not resolving a moment in time.
+export function addDaysToKey(dateKey: string, days: number): string {
+  const d = new Date(`${dateKey}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+// Last day of the calendar month containing dateKey, as a YYYY-MM-DD key.
+export function monthEndKey(dateKey: string): string {
+  const d = new Date(`${dateKey}T00:00:00Z`);
+  const end = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0));
+  return end.toISOString().slice(0, 10);
+}
+
 function displayNameSource(fullName: string | null, email: string | null): string | null {
   if (fullName?.trim()) return fullName.trim();
   if (email) return email.split("@")[0];
