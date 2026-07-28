@@ -1,36 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Pencil, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { MemoryCaseSelect } from "@/components/dashboard/memory-case-select";
-import { updateMemory, deleteMemory } from "@/lib/actions/memories";
-import { formatDate, formatDateTime } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import type { RecentActivityItem } from "@/lib/data/dashboard";
+
+// The edit/delete dialog (Radix Dialog + AlertDialog + full form) is only
+// ever needed after someone clicks a row, so it's fetched on demand instead
+// of hydrating unconditionally with the rest of the dashboard.
+const RecentActivityDetailDialog = dynamic(
+  () => import("@/components/dashboard/recent-activity-detail-dialog").then((m) => m.RecentActivityDetailDialog),
+  { ssr: false },
+);
 
 const TYPE_LABEL: Record<RecentActivityItem["type"], string> = {
   argument: "Argument",
@@ -85,14 +68,6 @@ export function RecentActivityPanel({
   timeZone: string;
 }) {
   const [selected, setSelected] = useState<RecentActivityItem | null>(null);
-  const [editing, setEditing] = useState(false);
-
-  function closeDialog(open: boolean) {
-    if (!open) {
-      setSelected(null);
-      setEditing(false);
-    }
-  }
 
   if (items.length === 0) return null;
 
@@ -117,10 +92,7 @@ export function RecentActivityPanel({
             ) : (
               <button
                 type="button"
-                onClick={() => {
-                  setSelected(item);
-                  setEditing(false);
-                }}
+                onClick={() => setSelected(item)}
                 className="hover:bg-accent/50 -mx-1 block w-[calc(100%+0.5rem)] cursor-pointer rounded-lg px-1 text-left"
               >
                 <ActivityRow item={item} locale={locale} timeZone={timeZone} />
@@ -130,131 +102,15 @@ export function RecentActivityPanel({
         ))}
       </ul>
 
-      <Dialog open={!!selected} onOpenChange={closeDialog}>
-        <DialogContent className="sm:max-w-lg" showCloseButton={false}>
-          {selected && editing && (
-            <>
-              <DialogHeader>
-                <div className="flex items-center justify-between gap-2">
-                  <DialogTitle>Edit memory</DialogTitle>
-                  <DialogClose asChild>
-                    <Button type="button" variant="ghost" size="icon-sm" aria-label="Close">
-                      <X />
-                    </Button>
-                  </DialogClose>
-                </div>
-              </DialogHeader>
-              <form
-                action={updateMemory}
-                onSubmit={() => closeDialog(false)}
-                className="flex flex-col gap-3"
-              >
-                <input type="hidden" name="id" value={selected.id} />
-                <input type="hidden" name="previous_case_id" value={selected.caseId ?? ""} />
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="recent-memory-case">Linked case</Label>
-                  <MemoryCaseSelect id="recent-memory-case" cases={cases} defaultValue={selected.caseId} />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="recent-memory-content">What did you learn?</Label>
-                  <Textarea
-                    id="recent-memory-content"
-                    name="content"
-                    rows={4}
-                    required
-                    defaultValue={selected.content}
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="recent-memory-tags">Tags</Label>
-                  <Input
-                    id="recent-memory-tags"
-                    name="tags"
-                    defaultValue={selected.tags.join(", ")}
-                    placeholder="comma-separated"
-                  />
-                </div>
-                <Button type="submit" size="sm" className="self-start">
-                  Save changes
-                </Button>
-              </form>
-            </>
-          )}
-
-          {selected && !editing && (
-            <>
-              <DialogHeader>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Badge variant={TYPE_VARIANT[selected.type]} className="font-normal">
-                      {TYPE_LABEL[selected.type]}
-                    </Badge>
-                    <DialogTitle className="text-base">
-                      {selected.caseTitle ?? "Not linked to a case"}
-                    </DialogTitle>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label="Edit memory"
-                      onClick={() => setEditing(true)}
-                    >
-                      <Pencil />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon-sm" aria-label="Delete memory">
-                          <Trash2 />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete this memory?</AlertDialogTitle>
-                          <AlertDialogDescription>This can&apos;t be undone.</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <form action={deleteMemory} onSubmit={() => closeDialog(false)}>
-                            <input type="hidden" name="id" value={selected.id} />
-                            {selected.caseId && (
-                              <input type="hidden" name="case_id" value={selected.caseId} />
-                            )}
-                            <AlertDialogAction type="submit" variant="destructive">
-                              Delete
-                            </AlertDialogAction>
-                          </form>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                    <DialogClose asChild>
-                      <Button type="button" variant="ghost" size="icon-sm" aria-label="Close">
-                        <X />
-                      </Button>
-                    </DialogClose>
-                  </div>
-                </div>
-                <DialogDescription>
-                  {formatDateTime(selected.createdAt, locale, timeZone)}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col gap-3">
-                <p className="text-sm whitespace-pre-wrap">{selected.content}</p>
-                {selected.tags.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {selected.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="font-normal">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      {selected && (
+        <RecentActivityDetailDialog
+          item={selected}
+          cases={cases}
+          locale={locale}
+          timeZone={timeZone}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </div>
   );
 }
