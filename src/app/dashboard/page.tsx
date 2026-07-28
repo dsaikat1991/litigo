@@ -1,9 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Briefcase, FolderPlus, Sparkles, UploadCloud } from "lucide-react";
 import { getCaseOptions, getCases } from "@/lib/data/cases";
 import { getMemories } from "@/lib/data/memories";
 import { getCurrentProfile } from "@/lib/data/profile";
-import { getAttentionAlerts, getPracticeInsights, getRecentActivity } from "@/lib/data/dashboard";
 import { getFirstName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NewCaseDialogRoot } from "@/components/dashboard/new-case-dialog-root";
@@ -16,10 +16,15 @@ import { MemoryList } from "@/components/dashboard/memory-list";
 import { Greeting } from "@/components/dashboard/greeting";
 import { SearchBar } from "@/components/dashboard/search-bar";
 import { ContentTypeTabs } from "@/components/dashboard/content-type-tabs";
-import { AttentionPanel } from "@/components/dashboard/attention-panel";
-import { ReflectionBanner } from "@/components/dashboard/reflection-banner";
-import { RecentActivityPanel } from "@/components/dashboard/recent-activity-panel";
-import { PracticeInsightsPanel } from "@/components/dashboard/practice-insights-panel";
+import { AttentionPanelAsync } from "@/components/dashboard/attention-panel-async";
+import { ReflectionBannerAsync } from "@/components/dashboard/reflection-banner-async";
+import { RecentActivityPanelAsync } from "@/components/dashboard/recent-activity-panel-async";
+import { PracticeInsightsPanelAsync } from "@/components/dashboard/practice-insights-panel-async";
+import {
+  AttentionPanelSkeleton,
+  PracticeInsightsPanelSkeleton,
+  RecentActivityPanelSkeleton,
+} from "@/components/dashboard/dashboard-skeletons";
 import { EmptyStatePanel } from "@/components/dashboard/empty-state-panel";
 import { CaseStatusFilter, isCaseStatus } from "@/components/dashboard/case-status-filter";
 
@@ -32,6 +37,11 @@ export default async function DashboardPage({
   const status = rawStatus && isCaseStatus(rawStatus) ? rawStatus : undefined;
   const isFiltering = !!q || !!status;
 
+  // Only what the shell, header, and "Continue working" section need is
+  // fetched here and blocks the initial render. Needs Attention, Recent
+  // Memory, and Practice Insights are secondary/below-the-fold — each
+  // fetches its own data inside its own component and streams in via
+  // Suspense below, instead of the whole page waiting on all of it.
   const [cases, memories, profile, caseOptions] = await Promise.all([
     getCases(q, status),
     getMemories({ search: q }),
@@ -40,17 +50,6 @@ export default async function DashboardPage({
   ]);
   const locale = profile?.locale ?? "en-IN";
   const timeZone = profile?.timezone ?? "Asia/Kolkata";
-
-  // The richer "at a glance" widgets (alerts, recent activity, insights) only
-  // make sense for the unfiltered home view — while searching, these queries
-  // would just be wasted work, so they're skipped entirely.
-  const { alerts, reflectionCandidate } = isFiltering
-    ? { alerts: [], reflectionCandidate: null }
-    : await getAttentionAlerts(timeZone);
-  const recentActivity = isFiltering ? [] : await getRecentActivity(2);
-  const practiceInsights = isFiltering
-    ? { mostUsedTag: null, argumentsWorkedCount: 0 }
-    : await getPracticeInsights();
 
   const totalArguments = cases.reduce((sum, c) => sum + (c.argument_count ?? 0), 0);
   const totalResearch = cases.reduce((sum, c) => sum + (c.research_count ?? 0), 0);
@@ -181,21 +180,24 @@ export default async function DashboardPage({
                   )}
                 </section>
 
-                {reflectionCandidate && (
-                  <ReflectionBanner caseId={reflectionCandidate.id} caseTitle={reflectionCandidate.title} />
-                )}
+                <Suspense fallback={null}>
+                  <ReflectionBannerAsync timeZone={timeZone} />
+                </Suspense>
 
-                {cases.length > 0 && <PracticeInsightsPanel insights={practiceInsights} />}
+                {cases.length > 0 && (
+                  <Suspense fallback={<PracticeInsightsPanelSkeleton />}>
+                    <PracticeInsightsPanelAsync />
+                  </Suspense>
+                )}
               </div>
 
               <div className="flex flex-col gap-6">
-                <AttentionPanel alerts={alerts} />
-                <RecentActivityPanel
-                  items={recentActivity}
-                  cases={caseOptions}
-                  locale={locale}
-                  timeZone={timeZone}
-                />
+                <Suspense fallback={<AttentionPanelSkeleton />}>
+                  <AttentionPanelAsync timeZone={timeZone} />
+                </Suspense>
+                <Suspense fallback={<RecentActivityPanelSkeleton />}>
+                  <RecentActivityPanelAsync cases={caseOptions} locale={locale} timeZone={timeZone} />
+                </Suspense>
                 {cases.length === 0 && memories.length === 0 && (
                   <EmptyStatePanel
                     icon={Sparkles}

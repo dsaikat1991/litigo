@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 export interface AttentionAlert {
@@ -35,7 +36,11 @@ function dayKey(d: Date, timeZone: string): string {
   return d.toLocaleDateString("en-CA", { timeZone });
 }
 
-export async function getAttentionAlerts(
+// Cached per-request: AttentionPanelAsync and ReflectionBannerAsync each
+// stream independently (separate Suspense boundaries) but both need this
+// same query — cache() collapses the two calls into a single Supabase
+// round-trip instead of duplicating it.
+export const getAttentionAlerts = cache(async function getAttentionAlerts(
   timeZone: string,
 ): Promise<{ alerts: AttentionAlert[]; reflectionCandidate: ReflectionCandidate | null }> {
   const supabase = await createClient();
@@ -110,7 +115,7 @@ export async function getAttentionAlerts(
     : null;
 
   return { alerts, reflectionCandidate };
-}
+});
 
 interface NoteRow {
   id: string;
