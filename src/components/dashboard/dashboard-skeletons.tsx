@@ -6,7 +6,7 @@ function SkeletonBlock({ className }: { className: string }) {
   return <div className={`bg-muted animate-pulse rounded ${className}`} />;
 }
 
-export function AttentionPanelSkeleton() {
+function AttentionPanelSkeleton() {
   return (
     <div className="rounded-xl border p-4">
       <div className="flex items-center gap-2">
@@ -38,7 +38,7 @@ export function PracticeInsightsPanelSkeleton() {
   );
 }
 
-export function RecentActivityPanelSkeleton() {
+function RecentActivityPanelSkeleton() {
   return (
     <div className="rounded-xl border p-4">
       <div className="flex items-center justify-between gap-2">
@@ -56,6 +56,19 @@ export function RecentActivityPanelSkeleton() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// AttentionPanel and RecentActivityPanel now stream as a single Suspense
+// boundary (see DashboardSidePanelAsync) so they resolve together — this is
+// their combined fallback, kept as one export so there's no way for the two
+// halves to end up in different boundaries again by accident.
+export function DashboardSidePanelSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      <AttentionPanelSkeleton />
+      <RecentActivityPanelSkeleton />
     </div>
   );
 }

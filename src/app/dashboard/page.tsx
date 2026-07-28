@@ -16,14 +16,12 @@ import { MemoryList } from "@/components/dashboard/memory-list";
 import { Greeting } from "@/components/dashboard/greeting";
 import { SearchBar } from "@/components/dashboard/search-bar";
 import { ContentTypeTabs } from "@/components/dashboard/content-type-tabs";
-import { AttentionPanelAsync } from "@/components/dashboard/attention-panel-async";
+import { DashboardSidePanelAsync } from "@/components/dashboard/dashboard-side-panel-async";
 import { ReflectionBannerAsync } from "@/components/dashboard/reflection-banner-async";
-import { RecentActivityPanelAsync } from "@/components/dashboard/recent-activity-panel-async";
 import { PracticeInsightsPanelAsync } from "@/components/dashboard/practice-insights-panel-async";
 import {
-  AttentionPanelSkeleton,
+  DashboardSidePanelSkeleton,
   PracticeInsightsPanelSkeleton,
-  RecentActivityPanelSkeleton,
 } from "@/components/dashboard/dashboard-skeletons";
 import { EmptyStatePanel } from "@/components/dashboard/empty-state-panel";
 import { CaseStatusFilter, isCaseStatus } from "@/components/dashboard/case-status-filter";
@@ -192,11 +190,8 @@ export default async function DashboardPage({
               </div>
 
               <div className="flex flex-col gap-6">
-                <Suspense fallback={<AttentionPanelSkeleton />}>
-                  <AttentionPanelAsync timeZone={timeZone} />
-                </Suspense>
-                <Suspense fallback={<RecentActivityPanelSkeleton />}>
-                  <RecentActivityPanelAsync cases={caseOptions} locale={locale} timeZone={timeZone} />
+                <Suspense fallback={<DashboardSidePanelSkeleton />}>
+                  <DashboardSidePanelAsync cases={caseOptions} locale={locale} timeZone={timeZone} />
                 </Suspense>
                 {cases.length === 0 && memories.length === 0 && (
                   <EmptyStatePanel
