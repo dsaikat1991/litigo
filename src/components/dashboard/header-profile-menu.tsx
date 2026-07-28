@@ -23,7 +23,9 @@ export function HeaderProfileMenu({
 }) {
   return (
     <div className="flex items-center gap-1">
-      <DropdownMenu>
+      {/* modal={false}: see notification-bell.tsx — Radix's default scroll-lock
+          double-counts against `scrollbar-gutter: stable` and shifts the page. */}
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <button className="ml-1 cursor-pointer rounded-full outline-none select-none focus-visible:ring-2 focus-visible:ring-ring">
             <Avatar>

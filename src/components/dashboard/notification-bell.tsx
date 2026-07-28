@@ -53,7 +53,12 @@ export function NotificationBell({
   }
 
   return (
-    <DropdownMenu>
+    // modal={false}: Radix's default (modal) scroll-lock wraps content in
+    // RemoveScroll, which computes its own scrollbar-compensation padding —
+    // that double-counts against the app's own `scrollbar-gutter: stable`
+    // (globals.css) and visibly shifts the page open/close. A dropdown menu
+    // doesn't need scroll-locking the way a true modal Dialog does.
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
           <Bell />
