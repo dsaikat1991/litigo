@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
-import { MemorySearchPreview } from "@/components/marketing/memory-search-preview";
-import { AnimatedHeadlineWord } from "@/components/marketing/animated-headline-word";
+import { DashboardPreview } from "@/components/marketing/dashboard-preview";
 
 export default function Home() {
   return (
@@ -23,41 +22,22 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-8 px-4 py-16 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-0">
-        <div className="flex flex-col items-start gap-5 py-4 lg:py-16">
-          <span className="text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
-            The legal memory system for litigators
-          </span>
-          {/* A fixed break, not text-balance: with a cycling word, letting the
-              browser auto-balance line breaks means the wrap point shifts as
-              the word grows/shrinks mid-animation — "memory," visibly jumps
-              between lines. This keeps "Your legal memory," / "finally
-              [word]." fixed on two lines regardless of the word's length.
-              max-width is a measured pixel value, not a ch-based guess:
-              "finally compounding." (the longest of the three words) needs
-              ~362px at this font/weight — a ch-based cap was ~30px short,
-              which is exactly what pushed the trailing period onto its own
-              third line. */}
-          <h1 className="max-w-[420px] text-3xl leading-snug font-medium sm:text-4xl">
-            Your legal memory,
+      <main className="flex flex-1 flex-col gap-14 sm:gap-20">
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-4 pt-28 text-left sm:px-8 sm:pt-40 lg:pt-48">
+          <h1 className="text-4xl leading-[1.1] font-medium tracking-tight sm:text-5xl lg:text-6xl">
+            Your legal memory, finally
             <br />
-            finally <AnimatedHeadlineWord />.
+            findable.
           </h1>
-          <p className="font-manrope text-muted-foreground max-w-md text-base leading-snug text-balance">
+          <p className="font-manrope text-muted-foreground max-w-2xl text-lg leading-snug text-balance">
             Litigo remembers every argument, research note and lesson — so that you can instantly
             find and reuse them, even decades later.
           </p>
-          <div className="mt-1 flex items-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/signup">Start building your memory</Link>
-            </Button>
-            <Button asChild variant="ghost" size="lg">
-              <Link href="/login">Sign in</Link>
-            </Button>
-          </div>
         </div>
 
-        <MemorySearchPreview />
+        <div className="mx-auto w-full max-w-[90rem] px-4 pb-16 sm:px-8 sm:pb-24">
+          <DashboardPreview />
+        </div>
       </main>
 
       <footer className="border-t px-4 py-6 sm:px-8">
