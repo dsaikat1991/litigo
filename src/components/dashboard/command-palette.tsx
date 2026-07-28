@@ -12,15 +12,15 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { NewCaseDialog } from "@/components/dashboard/new-case-dialog";
-import { AddMemoryDialog } from "@/components/dashboard/add-memory-dialog";
+import { useOpenNewCaseDialog } from "@/components/dashboard/new-case-dialog-root";
+import { useOpenAddMemoryDialog } from "@/components/dashboard/add-memory-dialog-root";
 
 export function CommandPalette({ cases }: { cases: { id: string; title: string }[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [newCaseOpen, setNewCaseOpen] = useState(false);
-  const [addMemoryOpen, setAddMemoryOpen] = useState(false);
+  const openNewCaseDialog = useOpenNewCaseDialog();
+  const openAddMemoryDialog = useOpenAddMemoryDialog();
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -56,87 +56,82 @@ export function CommandPalette({ cases }: { cases: { id: string; title: string }
   const trimmedQuery = query.trim();
 
   return (
-    <>
-      <CommandDialog
-        open={open}
-        onOpenChange={handleOpenChange}
-        title="Command palette"
-        description="Jump to a case, capture a memory, or search your legal memory."
-      >
-        <Command>
-          <CommandInput
-            placeholder="Search cases, or type a command…"
-            value={query}
-            onValueChange={setQuery}
-          />
-          <CommandList>
-            <CommandEmpty>No matches.</CommandEmpty>
+    <CommandDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      title="Command palette"
+      description="Jump to a case, capture a memory, or search your legal memory."
+    >
+      <Command>
+        <CommandInput
+          placeholder="Search cases, or type a command…"
+          value={query}
+          onValueChange={setQuery}
+        />
+        <CommandList>
+          <CommandEmpty>No matches.</CommandEmpty>
 
-            <CommandGroup heading="Actions">
-              <CommandItem
-                onSelect={() => {
-                  setOpen(false);
-                  setNewCaseOpen(true);
-                }}
-              >
-                <FolderPlus />
-                New case
-              </CommandItem>
-              <CommandItem
-                onSelect={() => {
-                  setOpen(false);
-                  setAddMemoryOpen(true);
-                }}
-              >
-                <FilePlus />
-                Add memory
-              </CommandItem>
-              <CommandItem
-                onSelect={() => {
-                  setOpen(false);
-                  router.push("/dashboard/profile");
-                }}
-              >
-                <UserRound />
-                View profile
+          <CommandGroup heading="Actions">
+            <CommandItem
+              onSelect={() => {
+                setOpen(false);
+                openNewCaseDialog();
+              }}
+            >
+              <FolderPlus />
+              New case
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setOpen(false);
+                openAddMemoryDialog();
+              }}
+            >
+              <FilePlus />
+              Add memory
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setOpen(false);
+                router.push("/dashboard/profile");
+              }}
+            >
+              <UserRound />
+              View profile
+            </CommandItem>
+          </CommandGroup>
+
+          {cases.length > 0 && (
+            <CommandGroup heading="Cases">
+              {cases.map((c) => (
+                <CommandItem
+                  key={c.id}
+                  value={`case-${c.title}`}
+                  onSelect={() => {
+                    setOpen(false);
+                    router.push(`/dashboard/cases/${c.id}`);
+                  }}
+                >
+                  {c.title}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+
+          {/* This item's value always contains the current query, so cmdk's
+              fuzzy filter always keeps it visible while there's a query —
+              a real, keyboard-selectable fallback rather than a raw button
+              floating outside cmdk's own item/selection model. */}
+          {trimmedQuery && (
+            <CommandGroup heading="Search">
+              <CommandItem value={`search ${trimmedQuery}`} onSelect={runSearch}>
+                <Search />
+                Search your legal memory for &ldquo;{trimmedQuery}&rdquo;
               </CommandItem>
             </CommandGroup>
-
-            {cases.length > 0 && (
-              <CommandGroup heading="Cases">
-                {cases.map((c) => (
-                  <CommandItem
-                    key={c.id}
-                    value={`case-${c.title}`}
-                    onSelect={() => {
-                      setOpen(false);
-                      router.push(`/dashboard/cases/${c.id}`);
-                    }}
-                  >
-                    {c.title}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-
-            {/* This item's value always contains the current query, so cmdk's
-                fuzzy filter always keeps it visible while there's a query —
-                a real, keyboard-selectable fallback rather than a raw button
-                floating outside cmdk's own item/selection model. */}
-            {trimmedQuery && (
-              <CommandGroup heading="Search">
-                <CommandItem value={`search ${trimmedQuery}`} onSelect={runSearch}>
-                  <Search />
-                  Search your legal memory for &ldquo;{trimmedQuery}&rdquo;
-                </CommandItem>
-              </CommandGroup>
-            )}
-          </CommandList>
-        </Command>
-      </CommandDialog>
-
-      <NewCaseDialog open={newCaseOpen} onOpenChange={setNewCaseOpen} />
-      <AddMemoryDialog open={addMemoryOpen} onOpenChange={setAddMemoryOpen} cases={cases} />
-    </>
+          )}
+        </CommandList>
+      </Command>
+    </CommandDialog>
   );
 }

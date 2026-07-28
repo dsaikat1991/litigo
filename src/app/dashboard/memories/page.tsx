@@ -2,7 +2,8 @@ import { Sparkles } from "lucide-react";
 import { getCaseOptions } from "@/lib/data/cases";
 import { getMemories } from "@/lib/data/memories";
 import { getCurrentProfile } from "@/lib/data/profile";
-import { AddMemoryDialog } from "@/components/dashboard/add-memory-dialog";
+import { AddMemoryDialogRoot } from "@/components/dashboard/add-memory-dialog-root";
+import { AddMemoryTriggerButton } from "@/components/dashboard/add-memory-trigger-button";
 import { MemoryList } from "@/components/dashboard/memory-list";
 import { EmptyStatePanel } from "@/components/dashboard/empty-state-panel";
 import { SearchBar } from "@/components/dashboard/search-bar";
@@ -22,40 +23,42 @@ export default async function MemoriesPage({
   const timeZone = profile?.timezone ?? "Asia/Kolkata";
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-lg font-medium">Memories</h1>
-        <AddMemoryDialog cases={caseOptions} />
-      </div>
+    <AddMemoryDialogRoot cases={caseOptions}>
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-heading text-lg font-medium">Memories</h1>
+          <AddMemoryTriggerButton />
+        </div>
 
-      <SearchBar
-        defaultValue={q ?? ""}
-        basePath="/dashboard/memories"
-        scope="memories"
-        showCommandPaletteHint={false}
-        placeholder="Search memories…"
-      />
-
-      {memories.length === 0 ? (
-        q ? (
-          <p className="text-muted-foreground py-8 text-sm">No memories match that search.</p>
-        ) : (
-          <EmptyStatePanel
-            icon={Sparkles}
-            title="No memories yet"
-            description="Save a fact worth remembering — a stamp-duty rate, a judge's remark, anything you'd otherwise forget."
-            action={<AddMemoryDialog cases={caseOptions} />}
-          />
-        )
-      ) : (
-        <MemoryList
-          memories={memories}
-          cases={caseOptions}
-          showCaseLink
-          locale={locale}
-          timeZone={timeZone}
+        <SearchBar
+          defaultValue={q ?? ""}
+          basePath="/dashboard/memories"
+          scope="memories"
+          showCommandPaletteHint={false}
+          placeholder="Search memories…"
         />
-      )}
-    </div>
+
+        {memories.length === 0 ? (
+          q ? (
+            <p className="text-muted-foreground py-8 text-sm">No memories match that search.</p>
+          ) : (
+            <EmptyStatePanel
+              icon={Sparkles}
+              title="No memories yet"
+              description="Save a fact worth remembering — a stamp-duty rate, a judge's remark, anything you'd otherwise forget."
+              action={<AddMemoryTriggerButton />}
+            />
+          )
+        ) : (
+          <MemoryList
+            memories={memories}
+            cases={caseOptions}
+            showCaseLink
+            locale={locale}
+            timeZone={timeZone}
+          />
+        )}
+      </div>
+    </AddMemoryDialogRoot>
   );
 }

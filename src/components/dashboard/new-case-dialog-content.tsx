@@ -1,40 +1,26 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId } from "react";
 import { createCase } from "@/lib/actions/cases";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-export function NewCaseDialog({
+// Always controlled — this is the one shared instance mounted by
+// NewCaseDialogRoot, opened from wherever useOpenNewCaseDialog() is called.
+export function NewCaseDialogContent({
   open,
   onOpenChange,
 }: {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-} = {}) {
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isControlled = open !== undefined;
-  const dialogOpen = isControlled ? open : internalOpen;
-  const setDialogOpen = isControlled ? onOpenChange! : setInternalOpen;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const uid = useId();
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      {!isControlled && (
-        <DialogTrigger asChild>
-          <Button>New case</Button>
-        </DialogTrigger>
-      )}
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>New case</DialogTitle>
