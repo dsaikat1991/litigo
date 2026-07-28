@@ -44,9 +44,8 @@ export default function Home() {
             finally <AnimatedHeadlineWord />.
           </h1>
           <p className="font-manrope text-muted-foreground max-w-md text-base leading-snug text-balance">
-            Every case you argue, every point of research, every lesson learned — Litigo keeps it,
-            so you never have to say &ldquo;I know I&apos;ve argued this before, I just
-            can&apos;t find it.&rdquo;
+            Litigo remembers every argument, research note and lesson — so that you can instantly
+            find and reuse them, even decades later.
           </p>
           <div className="mt-1 flex items-center gap-3">
             <Button asChild size="lg">
