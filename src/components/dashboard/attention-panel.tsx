@@ -8,7 +8,7 @@ export function AttentionPanel({ alerts }: { alerts: AttentionAlert[] }) {
     <div className="rounded-xl border p-4">
       <div className="flex items-center gap-2">
         <Bell className="text-muted-foreground size-4" />
-        <h2 className="font-heading text-sm font-medium">Needs your attention</h2>
+        <h2 className="text-sm font-medium">Needs your attention</h2>
       </div>
       <ul className="mt-2 flex flex-col">
         {alerts.map((alert) => (

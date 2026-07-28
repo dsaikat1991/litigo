@@ -24,7 +24,7 @@ export default function PersonalizePage() {
     <Card className="border-none shadow-none">
       <CardHeader className="text-center">
         <span className="text-muted-foreground text-xs font-medium">Step 2 of 3</span>
-        <CardTitle className="font-heading text-xl font-medium">Personalise Litigo</CardTitle>
+        <CardTitle className="text-xl font-medium">Personalise Litigo</CardTitle>
         <CardDescription>A few basics so dates, search, and your profile feel right.</CardDescription>
       </CardHeader>
       <CardContent>

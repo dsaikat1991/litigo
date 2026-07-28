@@ -41,7 +41,7 @@ export default async function CaseDetailPage({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="font-heading text-lg font-medium">{caseItem.title}</h1>
+          <h1 className="text-lg font-medium">{caseItem.title}</h1>
           <div className="flex shrink-0 items-center gap-2">
             <Badge variant={caseStatusBadgeVariant(caseItem.status)} className="capitalize">
               {caseItem.status}

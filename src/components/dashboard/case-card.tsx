@@ -49,7 +49,7 @@ export function CaseCard({
       <Card className="transition-colors hover:bg-accent/50">
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
-            <CardTitle className="font-heading text-base font-medium">{caseItem.title}</CardTitle>
+            <CardTitle className="text-base font-medium">{caseItem.title}</CardTitle>
             <Badge variant={caseStatusBadgeVariant(caseItem.status)} className="capitalize shrink-0">
               {caseItem.status}
             </Badge>

@@ -23,7 +23,7 @@ export default async function SignupPage({
     <div className="flex flex-1 items-center justify-center px-4 py-16">
       <Card className="w-full max-w-sm border-none shadow-none">
         <CardHeader className="text-center">
-          <CardTitle className="font-heading text-xl font-medium">Create your account</CardTitle>
+          <CardTitle className="text-xl font-medium">Create your account</CardTitle>
           <CardDescription>
             Start building your own legal memory.
           </CardDescription>

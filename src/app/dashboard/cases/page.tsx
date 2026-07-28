@@ -24,7 +24,7 @@ export default async function CasesPage({
     <NewCaseDialogRoot>
       <div className="flex flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-heading text-lg font-medium">Cases</h1>
+          <h1 className="text-lg font-medium">Cases</h1>
           <NewCaseTriggerButton />
         </div>
 

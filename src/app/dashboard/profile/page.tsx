@@ -43,7 +43,7 @@ export default async function ProfilePage({
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="font-heading text-lg font-medium">Your profile</h1>
+        <h1 className="text-lg font-medium">Your profile</h1>
         <p className="text-sm text-muted-foreground">
           Everything onboarding collected, editable in one place.
         </p>
@@ -58,7 +58,7 @@ export default async function ProfilePage({
 
       <form action={updateProfile} className="flex flex-col gap-6">
         <section className="flex flex-col gap-4 rounded-lg border p-4">
-          <h2 className="font-heading text-xs font-medium tracking-wider text-muted-foreground uppercase">
+          <h2 className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
             About you
           </h2>
           <div className="grid grid-cols-2 gap-4">
@@ -102,7 +102,7 @@ export default async function ProfilePage({
         </section>
 
         <section className="flex flex-col gap-4 rounded-lg border p-4">
-          <h2 className="font-heading text-xs font-medium tracking-wider text-muted-foreground uppercase">
+          <h2 className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
             Jurisdiction &amp; region
           </h2>
           <div className="flex flex-col gap-2">
@@ -142,7 +142,7 @@ export default async function ProfilePage({
         </section>
 
         <section className="flex flex-col gap-4 rounded-lg border p-4">
-          <h2 className="font-heading text-xs font-medium tracking-wider text-muted-foreground uppercase">
+          <h2 className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
             Practice
           </h2>
           <PracticeAreaPicker practiceAreas={practiceAreas} initialSelected={selectedAreas} />

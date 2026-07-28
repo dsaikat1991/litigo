@@ -20,7 +20,7 @@ export default async function ConfirmSignupPage({
     <div className="flex flex-1 items-center justify-center px-4 py-16">
       <Card className="w-full max-w-sm border-none shadow-none">
         <CardHeader className="text-center">
-          <CardTitle className="font-heading text-xl font-medium">
+          <CardTitle className="text-xl font-medium">
             {unconfirmed ? "Confirm your email to sign in" : "Check your email"}
           </CardTitle>
           <CardDescription>

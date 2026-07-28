@@ -23,7 +23,7 @@ export function Greeting({ name }: { name: string | null }) {
 
   return (
     <div>
-      <h1 className="font-heading text-xl font-medium">
+      <h1 className="text-xl font-medium">
         {greeting}
         {name ? `, ${name}` : ""}.
       </h1>

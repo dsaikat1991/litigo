@@ -20,7 +20,7 @@ export default async function ProfessionalDetailsPage() {
     <Card className="border-none shadow-none">
       <CardHeader className="text-center">
         <span className="text-muted-foreground text-xs font-medium">Step 3 of 3</span>
-        <CardTitle className="font-heading text-xl font-medium">
+        <CardTitle className="text-xl font-medium">
           Optional professional details
         </CardTitle>
         <CardDescription>

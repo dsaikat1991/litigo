@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { IBM_Plex_Mono, Inter, Manrope } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DeferredGoogleAnalytics } from "@/components/analytics/deferred-google-analytics";
 import "./globals.css";
@@ -13,6 +13,13 @@ const plexMono = IBM_Plex_Mono({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+});
+
+// Marketing-page body copy only (see src/app/page.tsx) — the dashboard and
+// the rest of the product still read on Inter via --font-sans.
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +37,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${plexMono.variable} ${manrope.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

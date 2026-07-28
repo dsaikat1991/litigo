@@ -28,7 +28,7 @@ export default async function CourtDiaryPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="font-heading text-lg font-medium">Court Diary</h1>
+        <h1 className="text-lg font-medium">Court Diary</h1>
         <p className="text-muted-foreground text-sm">
           {profile ? `${getFirstName(profile.fullName, profile.email)}'s ` : ""}
           hearing schedule and full record of what&apos;s already happened.

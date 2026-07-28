@@ -22,13 +22,13 @@ export default function HowItWorksPage() {
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-14 px-4 py-16 sm:px-8">
         <div className="flex flex-col gap-4">
-          <span className="font-heading text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
+          <span className="text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
             How it works
           </span>
-          <h1 className="font-heading max-w-[22ch] text-3xl font-medium text-balance">
+          <h1 className="max-w-[22ch] text-3xl font-medium text-balance">
             You already do the work. Litigo just makes sure it doesn&apos;t disappear.
           </h1>
-          <p className="text-muted-foreground max-w-lg text-[15px] text-balance">
+          <p className="font-manrope text-muted-foreground max-w-lg text-[15px] text-balance">
             No new habits, no daily logging chore. Three moves, done whenever you have a spare
             minute — not when a system demands it.
           </p>
@@ -37,10 +37,10 @@ export default function HowItWorksPage() {
         {/* Step 1 — Capture */}
         <section className="flex flex-col gap-4">
           <div className="flex items-baseline gap-3">
-            <span className="font-heading text-muted-foreground text-sm">01</span>
-            <h2 className="font-heading text-xl font-medium">Capture it when it happens</h2>
+            <span className="font-mono text-muted-foreground text-sm">01</span>
+            <h2 className="text-xl font-medium">Capture it when it happens</h2>
           </div>
-          <p className="text-foreground/90 max-w-lg text-[15px] leading-relaxed">
+          <p className="font-manrope text-foreground/90 max-w-lg text-[15px] leading-relaxed">
             Log a case in ten seconds — a title is the only thing required. As the matter moves,
             drop in the argument you actually made, the research behind it, the outcome. Nothing
             has to be complete, and nothing has to happen the same day it does. A fact that
@@ -49,7 +49,7 @@ export default function HowItWorksPage() {
           </p>
 
           <div className="bg-card rounded-xl border p-4">
-            <p className="font-heading text-sm font-medium">Sharma vs. Neeti</p>
+            <p className="text-sm font-medium">Sharma vs. Neeti</p>
             <p className="text-muted-foreground mb-3 text-xs">Civil Suit · Calcutta High Court</p>
             <div className="flex flex-col gap-2.5">
               <div className="flex items-start gap-2.5">
@@ -87,10 +87,10 @@ export default function HowItWorksPage() {
         {/* Step 2 — Organise */}
         <section className="flex flex-col gap-4">
           <div className="flex items-baseline gap-3">
-            <span className="font-heading text-muted-foreground text-sm">02</span>
-            <h2 className="font-heading text-xl font-medium">Tag it your way, not a system&apos;s</h2>
+            <span className="font-mono text-muted-foreground text-sm">02</span>
+            <h2 className="text-xl font-medium">Tag it your way, not a system&apos;s</h2>
           </div>
-          <p className="text-foreground/90 max-w-lg text-[15px] leading-relaxed">
+          <p className="font-manrope text-foreground/90 max-w-lg text-[15px] leading-relaxed">
             There&apos;s no fixed taxonomy to fight with — tags are free-form, because every
             advocate remembers a matter by a different hook: a section number, a client&apos;s
             name, a phrase they&apos;ll never forget. Everything you log under a case — arguments,
@@ -112,10 +112,10 @@ export default function HowItWorksPage() {
         {/* Step 3 — Reuse */}
         <section className="flex flex-col gap-4">
           <div className="flex items-baseline gap-3">
-            <span className="font-heading text-muted-foreground text-sm">03</span>
-            <h2 className="font-heading text-xl font-medium">Find it again in one search</h2>
+            <span className="font-mono text-muted-foreground text-sm">03</span>
+            <h2 className="text-xl font-medium">Find it again in one search</h2>
           </div>
-          <p className="text-foreground/90 max-w-lg text-[15px] leading-relaxed">
+          <p className="font-manrope text-foreground/90 max-w-lg text-[15px] leading-relaxed">
             Search across every case, argument, research note, and memory at once — typed the way
             you&apos;d actually think about it, not the way a database expects it. No remembering
             which file it&apos;s in. No re-arguing a point you already won once.
@@ -137,7 +137,7 @@ export default function HowItWorksPage() {
         </section>
 
         <div className="border-t pt-10">
-          <p className="font-heading text-muted-foreground mb-6 text-xs tracking-widest uppercase">
+          <p className="text-muted-foreground mb-6 text-xs tracking-widest uppercase">
             We believe legal experience should compound, not disappear.
           </p>
           <div className="flex items-center gap-3">

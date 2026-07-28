@@ -20,14 +20,14 @@ export default function AboutPage() {
       </header>
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-16 sm:px-8">
-        <span className="font-heading text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
+        <span className="text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
           About Litigo
         </span>
-        <h1 className="font-heading max-w-[20ch] text-3xl font-medium text-balance">
+        <h1 className="max-w-[20ch] text-3xl font-medium text-balance">
           Every case you argue leaves something behind. Litigo is where it stays.
         </h1>
 
-        <div className="text-foreground/90 flex flex-col gap-5 text-[15px] leading-relaxed">
+        <div className="font-manrope text-foreground/90 flex flex-col gap-5 text-[15px] leading-relaxed">
           <p>
             A litigating advocate builds real expertise over a career — arguments that worked,
             authorities that held up, questions a particular bench tends to ask, mistakes made

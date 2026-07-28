@@ -25,7 +25,7 @@ function InsightTile({
 export function PracticeInsightsPanel({ insights }: { insights: PracticeInsights }) {
   return (
     <div className="rounded-xl border p-4">
-      <h2 className="font-heading text-sm font-medium">Practice insights</h2>
+      <h2 className="text-sm font-medium">Practice insights</h2>
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <InsightTile
           icon={Users}

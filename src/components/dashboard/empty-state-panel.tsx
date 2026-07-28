@@ -18,7 +18,7 @@ export function EmptyStatePanel({
       </div>
       <div className="flex flex-col gap-1 px-6">
         <p className="text-sm font-medium">{title}</p>
-        <p className="text-muted-foreground max-w-[30ch] text-sm">{description}</p>
+        <p className="font-manrope text-muted-foreground max-w-[30ch] text-sm">{description}</p>
       </div>
       {action}
     </div>

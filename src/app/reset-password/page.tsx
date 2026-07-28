@@ -21,7 +21,7 @@ export default async function ResetPasswordPage({
     <div className="flex flex-1 items-center justify-center px-4 py-16">
       <Card className="w-full max-w-sm border-none shadow-none">
         <CardHeader className="text-center">
-          <CardTitle className="font-heading text-xl font-medium">Set a new password</CardTitle>
+          <CardTitle className="text-xl font-medium">Set a new password</CardTitle>
           <CardDescription>Choose a new password for your account.</CardDescription>
         </CardHeader>
         <CardContent>

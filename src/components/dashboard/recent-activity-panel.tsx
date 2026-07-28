@@ -74,7 +74,7 @@ export function RecentActivityPanel({
   return (
     <div className="rounded-xl border p-4">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="font-heading text-sm font-medium">Recent memory</h2>
+        <h2 className="text-sm font-medium">Recent memory</h2>
         <Link href="/dashboard/memories" className="text-muted-foreground hover:text-foreground text-xs">
           View all
         </Link>

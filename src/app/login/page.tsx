@@ -23,7 +23,7 @@ export default async function LoginPage({
     <div className="flex flex-1 items-center justify-center px-4 py-16">
       <Card className="w-full max-w-sm border-none shadow-none">
         <CardHeader className="text-center">
-          <CardTitle className="font-heading text-xl font-medium">Welcome back</CardTitle>
+          <CardTitle className="text-xl font-medium">Welcome back</CardTitle>
           <CardDescription>Sign in to your legal memory.</CardDescription>
         </CardHeader>
         <CardContent>

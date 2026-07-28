@@ -62,7 +62,7 @@ export default function RootError({ reset }: { error: Error & { digest?: string 
           <div className="bg-muted mb-2 flex size-10 items-center justify-center rounded-full">
             <AlertTriangle className="text-muted-foreground size-5" />
           </div>
-          <CardTitle className="font-heading text-xl font-medium">
+          <CardTitle className="text-xl font-medium">
             {sessionExpired ? "Your session expired" : "Something went wrong"}
           </CardTitle>
           <CardDescription>

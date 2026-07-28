@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 import { MemorySearchPreview } from "@/components/marketing/memory-search-preview";
+import { AnimatedHeadlineWord } from "@/components/marketing/animated-headline-word";
 
 export default function Home() {
   return (
@@ -24,13 +25,25 @@ export default function Home() {
 
       <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-8 px-4 py-16 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-0">
         <div className="flex flex-col items-start gap-5 py-4 lg:py-16">
-          <span className="font-heading text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
+          <span className="text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
             The legal memory system for litigators
           </span>
-          <h1 className="font-heading max-w-[15ch] text-3xl font-medium text-balance sm:text-4xl">
-            Your legal memory, finally findable.
+          {/* A fixed break, not text-balance: with a cycling word, letting the
+              browser auto-balance line breaks means the wrap point shifts as
+              the word grows/shrinks mid-animation — "memory," visibly jumps
+              between lines. This keeps "Your legal memory," / "finally
+              [word]." fixed on two lines regardless of the word's length.
+              max-width is a measured pixel value, not a ch-based guess:
+              "finally compounding." (the longest of the three words) needs
+              ~362px at this font/weight — a ch-based cap was ~30px short,
+              which is exactly what pushed the trailing period onto its own
+              third line. */}
+          <h1 className="max-w-[420px] text-3xl leading-snug font-medium sm:text-4xl">
+            Your legal memory,
+            <br />
+            finally <AnimatedHeadlineWord />.
           </h1>
-          <p className="text-muted-foreground max-w-md text-lg text-balance">
+          <p className="font-manrope text-muted-foreground max-w-md text-base leading-snug text-balance">
             Every case you argue, every point of research, every lesson learned — Litigo keeps it,
             so you never have to say &ldquo;I know I&apos;ve argued this before, I just
             can&apos;t find it.&rdquo;
@@ -65,7 +78,7 @@ export default function Home() {
             </Link>
           </nav>
 
-          <p className="font-heading order-1 text-center text-xs tracking-widest text-muted-foreground uppercase sm:order-2">
+          <p className="order-1 text-center text-xs tracking-widest text-muted-foreground uppercase sm:order-2">
             We believe legal experience should compound, not disappear.
           </p>
 

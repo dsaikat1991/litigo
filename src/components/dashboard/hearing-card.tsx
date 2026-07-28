@@ -24,7 +24,7 @@ export function HearingCard({
       <CardHeader>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Link href={`/dashboard/cases/${caseItem.id}`} className="hover:underline">
-            <CardTitle className="font-heading text-base font-medium">{caseItem.title}</CardTitle>
+            <CardTitle className="text-base font-medium">{caseItem.title}</CardTitle>
           </Link>
           <Badge variant={caseStatusBadgeVariant(caseItem.status)} className="capitalize shrink-0">
             {caseItem.status}

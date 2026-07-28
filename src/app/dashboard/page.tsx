@@ -102,7 +102,7 @@ export default async function DashboardPage({
               <section className="flex flex-col gap-3.5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="flex items-baseline gap-2">
-                    <h2 className="font-heading text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
+                    <h2 className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
                       Cases
                     </h2>
                     <span className="text-muted-foreground text-[11px]">{cases.length}</span>
@@ -124,7 +124,7 @@ export default async function DashboardPage({
 
               <section className="flex flex-col gap-3.5">
                 <div className="flex items-baseline gap-2">
-                  <h2 className="font-heading text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
+                  <h2 className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
                     Memories
                   </h2>
                   <span className="text-muted-foreground text-[11px]">{memories.length}</span>
@@ -150,7 +150,7 @@ export default async function DashboardPage({
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Briefcase className="text-muted-foreground size-4" />
-                        <h2 className="font-heading text-sm font-medium">Continue working</h2>
+                        <h2 className="text-sm font-medium">Continue working</h2>
                       </div>
                       {cases.length > continueWorkingCases.length && (
                         <Link
