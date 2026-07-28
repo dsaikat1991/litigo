@@ -82,9 +82,13 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signOut() {
+  // No redirect() here — this is invoked directly from a DropdownMenuItem's
+  // onSelect (not a <form>), and a server action's redirect() wasn't
+  // reliably reaching the client through that call path (session cleared
+  // correctly, but the page would just sit on /dashboard until a manual
+  // refresh). The caller drives navigation explicitly once this resolves.
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/login");
 }
 
 export async function requestPasswordReset(formData: FormData) {
