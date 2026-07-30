@@ -88,7 +88,7 @@ export default function Home() {
         <div className="mt-2 border-b">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 pt-6 pb-14 px-4 text-left sm:px-8 sm:pt-8 sm:pb-20">
             <h2 className="max-w-5xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-              Your legal memory compounds with every case.
+              Your legal learning compounds with every case.
             </h2>
             <p className="font-manrope text-muted-foreground max-w-2xl text-lg leading-relaxed text-balance">
               Every case, every argument, every research note and every lesson becomes part of a
@@ -136,11 +136,13 @@ export default function Home() {
           {/* Heading-left, description-right — a two-column split instead
               of a stacked block, deliberately not a repeat of the previous
               section's treatment. No text highlighting here. */}
-          <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-6 px-4 pt-20 pb-10 text-left sm:grid-cols-2 sm:items-center sm:px-8 sm:pt-28">
-            <h2 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-              Find what you&apos;ve already learned.
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 px-4 pt-20 pb-10 text-left sm:grid-cols-2 sm:items-center sm:px-8 sm:pt-28">
+            <h2 className="text-left text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+              Find what you&apos;ve
+              <br />
+              already learned.
             </h2>
-            <p className="font-manrope text-muted-foreground text-lg leading-relaxed text-balance">
+            <p className="font-manrope text-muted-foreground text-right text-lg leading-relaxed text-balance">
               Instantly surface the arguments, research, strategy and lessons you&apos;ve built over
               years of practice—without digging through folders or old files.
             </p>
