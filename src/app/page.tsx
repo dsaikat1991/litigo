@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/logo";
+import { EyeOff, KeyRound, Lock, Play, PenLine, Search, TrendingUp, Zap } from "lucide-react";
 import { DashboardPreview } from "@/components/marketing/dashboard-preview";
 import { MemorySearchPreview } from "@/components/marketing/memory-search-preview";
 import { CaptureIcon, BuildIcon, FindIcon } from "@/components/marketing/capture-build-find";
+import { SiteHeader } from "@/components/marketing/site-header";
 
 const STEPS = [
   {
@@ -30,26 +29,57 @@ const STEPS = [
   },
 ] as const;
 
+const WHY_POINTS = [
+  {
+    Icon: Search,
+    title: "Search beyond file names",
+    description:
+      "Find cases by arguments, legal issues, parties, judgments or your own notes.",
+  },
+  {
+    Icon: TrendingUp,
+    title: "Experience compounds",
+    description: "Turn every matter into knowledge you can reuse in the next one.",
+  },
+  {
+    Icon: KeyRound,
+    title: "You own your work",
+    description: "Your legal knowledge remains yours, always.",
+  },
+  {
+    Icon: Zap,
+    title: "Designed for speed",
+    description: "Find what matters in seconds and stay focused on your practice.",
+  },
+] as const;
+
+const TRUST_POINTS = [
+  {
+    Icon: Lock,
+    title: "Isolated at the database level",
+    description:
+      "Row-level security scopes every account's cases, arguments, and memories to that account alone — enforced by the database itself, not just filtered in the app.",
+  },
+  {
+    Icon: EyeOff,
+    title: "Never shared. Never sold.",
+    description:
+      "What you write down stays yours. Nothing is shared across accounts, and nothing is used to train any AI model.",
+  },
+  {
+    Icon: PenLine,
+    title: "You decide what's captured",
+    description:
+      "Nothing is logged automatically. Every entry — a case, an argument, a memory — is something you chose to write down.",
+  },
+] as const;
+
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col overflow-x-hidden">
-      <header className="border-b">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-8">
-          <Link href="/">
-            <Logo />
-          </Link>
-          <nav className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/login">Sign in</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/signup">Sign up</Link>
-            </Button>
-          </nav>
-        </div>
-      </header>
+    <div className="flex flex-1 flex-col">
+      <SiteHeader />
 
-      <main className="flex flex-1 flex-col gap-14 sm:gap-20">
+      <main className="flex flex-1 flex-col gap-14 overflow-x-hidden sm:gap-20">
         <div className="relative mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-4 pt-28 text-left sm:px-8 sm:pt-40 lg:pt-48">
           <div
             aria-hidden="true"
@@ -148,8 +178,96 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mx-auto w-full max-w-2xl px-4 pb-24 sm:px-8 sm:pb-32">
+          <div className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-8 sm:pb-32">
             <MemorySearchPreview />
+          </div>
+        </div>
+
+        {/* A 2x2 icon-left/text-right benefits grid — the verified-green
+            circular badges echo the accent's established "confirmed, worth
+            noticing" role elsewhere, giving this section a positive,
+            celebratory register that the plain trust section right after
+            it deliberately does not share. */}
+        <div className="border-t">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 text-left sm:px-8 sm:py-24">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Why Litigo</h2>
+            <div className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2">
+              {WHY_POINTS.map((point) => {
+                const Icon = point.Icon;
+                return (
+                  <div key={point.title} className="flex gap-4">
+                    <div className="bg-verified/10 flex size-11 shrink-0 items-center justify-center rounded-full">
+                      <Icon className="text-verified size-5" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <h3 className="text-base font-semibold tracking-tight">{point.title}</h3>
+                      <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
+                        {point.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Deliberately plain and direct — no icons-with-colored-badges, no
+            editorial illustration, no interactive demo. A trust section
+            about confidentiality reads as more credible when it looks
+            serious rather than "on-brand playful", which is why this one
+            breaks from every visual treatment used above it. */}
+        <div className="border-t">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 text-left sm:px-8 sm:py-24">
+            <div className="flex max-w-2xl flex-col gap-3">
+              <span className="text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
+                Privacy, by design
+              </span>
+              <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+                Client confidentiality doesn&apos;t stop at your case files.
+              </h2>
+              <p className="font-manrope text-muted-foreground max-w-xl text-lg leading-relaxed text-balance">
+                Litigo is built for a profession where confidentiality isn&apos;t optional —
+                the same discipline applies to how your own data is handled.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+              {TRUST_POINTS.map((point) => {
+                const Icon = point.Icon;
+                return (
+                  <div key={point.title} className="flex flex-col gap-3 rounded-lg border p-4">
+                    <Icon className="text-muted-foreground size-5" />
+                    <h3 className="text-sm font-semibold tracking-tight">{point.title}</h3>
+                    <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
+                      {point.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Closing CTA — the page had no final call-to-action before this;
+            it just ended after the last content section. A soft verified
+            tint (not a new color, same token used at low opacity
+            elsewhere) marks it as the page's closing beat before the
+            footer, without needing a hard border to separate it. */}
+        <div className="bg-verified/5 border-t">
+          <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 px-4 py-20 text-center sm:px-8 sm:py-28">
+            <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+              Your legal memory starts with the next case you open.
+            </h2>
+            <p className="font-manrope text-muted-foreground max-w-md text-lg leading-relaxed text-balance">
+              Two minutes to set up. No credit card, no migration, no new habit to learn.
+            </p>
+            <Link
+              href="/signup"
+              className="bg-foreground text-background mt-2 rounded-lg px-6 py-3 text-sm font-medium"
+            >
+              Start building your memory
+            </Link>
           </div>
         </div>
       </main>
