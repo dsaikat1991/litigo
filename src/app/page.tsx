@@ -1,8 +1,16 @@
 import Link from "next/link";
-import { EyeOff, KeyRound, Lock, Play, PenLine, Search, TrendingUp, Zap } from "lucide-react";
+import { EyeOff, Lock, Play, PenLine } from "lucide-react";
 import { DashboardPreview } from "@/components/marketing/dashboard-preview";
 import { MemorySearchPreview } from "@/components/marketing/memory-search-preview";
-import { CaptureIcon, BuildIcon, FindIcon } from "@/components/marketing/capture-build-find";
+import {
+  CaptureIcon,
+  BuildIcon,
+  FindIcon,
+  SearchDepthIcon,
+  CompoundGrowthIcon,
+  OwnershipIcon,
+  SpeedIcon,
+} from "@/components/marketing/capture-build-find";
 import { SiteHeader } from "@/components/marketing/site-header";
 
 const STEPS = [
@@ -31,23 +39,23 @@ const STEPS = [
 
 const WHY_POINTS = [
   {
-    Icon: Search,
+    Icon: SearchDepthIcon,
     title: "Search beyond file names",
     description:
       "Find cases by arguments, legal issues, parties, judgments or your own notes.",
   },
   {
-    Icon: TrendingUp,
+    Icon: CompoundGrowthIcon,
     title: "Experience compounds",
     description: "Turn every matter into knowledge you can reuse in the next one.",
   },
   {
-    Icon: KeyRound,
+    Icon: OwnershipIcon,
     title: "You own your work",
     description: "Your legal knowledge remains yours, always.",
   },
   {
-    Icon: Zap,
+    Icon: SpeedIcon,
     title: "Designed for speed",
     description: "Find what matters in seconds and stay focused on your practice.",
   },
@@ -115,10 +123,18 @@ export default function Home() {
           <DashboardPreview />
         </div>
 
-        <div className="mt-2 border-b">
-          <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 pt-6 pb-14 px-4 text-left sm:px-8 sm:pt-8 sm:pb-20">
+        <div className="relative mt-2 border-b">
+          {/* Bridges the dashboard's own fade-out into this section instead
+              of a flat, empty gap between them — same ambient-glow language
+              used at the hero and around the dashboard card, just extended
+              into the one transition on the page that didn't have it yet. */}
+          <div
+            aria-hidden="true"
+            className="bg-verified/8 pointer-events-none absolute inset-x-0 -top-16 mx-auto h-56 w-56 rounded-full blur-3xl"
+          />
+          <div className="relative mx-auto flex w-full max-w-6xl flex-col items-start gap-6 pt-6 pb-14 px-4 text-left sm:px-8 sm:pt-8 sm:pb-20">
             <h2 className="max-w-5xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-              Your legal learning compounds with every case.
+              Your legal experience compounds with every case.
             </h2>
             <p className="font-manrope text-muted-foreground max-w-2xl text-lg leading-relaxed text-balance">
               Every case, every argument, every research note and every lesson becomes part of a
@@ -144,15 +160,12 @@ export default function Home() {
                     key={step.number}
                     className={`flex flex-col items-start gap-4 text-left ${paddingClass}`}
                   >
-                    <span className="font-mono text-muted-foreground text-xs tracking-wider">
+                    <span className="font-mono text-muted-foreground/50 text-xs tracking-wider">
                       {step.number}
                     </span>
-                    <Icon
-                      className="text-muted-foreground/70 animate-icon-float size-14"
-                      style={{ animationDelay: `${i * 0.5}s` }}
-                    />
-                    <h3 className="text-lg font-semibold tracking-tight">{step.title}</h3>
-                    <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
+                    <Icon className="text-foreground/80 h-40 w-auto self-center" />
+                    <h3 className="text-lg font-bold tracking-tight">{step.title}</h3>
+                    <p className="font-manrope text-muted-foreground/80 text-sm leading-relaxed">
                       {step.description}
                     </p>
                   </div>
@@ -183,28 +196,23 @@ export default function Home() {
           </div>
         </div>
 
-        {/* A 2x2 icon-left/text-right benefits grid — the verified-green
-            circular badges echo the accent's established "confirmed, worth
-            noticing" role elsewhere, giving this section a positive,
-            celebratory register that the plain trust section right after
-            it deliberately does not share. */}
+        {/* A 2x2 benefits grid using the same isometric-illustration family
+            as the Capture/Build/Find section above, so the two illustrated
+            sections read as one visual language rather than the icon set
+            switching languages partway down the page. */}
         <div className="border-t">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 text-left sm:px-8 sm:py-24">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Why Litigo</h2>
-            <div className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2">
               {WHY_POINTS.map((point) => {
                 const Icon = point.Icon;
                 return (
-                  <div key={point.title} className="flex gap-4">
-                    <div className="bg-verified/10 flex size-11 shrink-0 items-center justify-center rounded-full">
-                      <Icon className="text-verified size-5" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <h3 className="text-base font-semibold tracking-tight">{point.title}</h3>
-                      <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
-                        {point.description}
-                      </p>
-                    </div>
+                  <div key={point.title} className="flex flex-col items-start gap-3 text-left">
+                    <Icon className="text-foreground/80 h-24 w-auto" />
+                    <h3 className="text-base font-semibold tracking-tight">{point.title}</h3>
+                    <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
+                      {point.description}
+                    </p>
                   </div>
                 );
               })}
