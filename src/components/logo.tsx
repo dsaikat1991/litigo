@@ -1,5 +1,5 @@
 export function Logo({ className }: { className?: string }) {
-  // Explicit width/height (matching the SVG's real 750:225 viewBox ratio) let
+  // Explicit width/height (matching the SVG's real 375:150 viewBox ratio) let
   // the browser reserve the right space before the image loads, avoiding
   // layout shift — the CSS className still controls the actual rendered
   // size, this is just the intrinsic-size hint.
@@ -8,7 +8,7 @@ export function Logo({ className }: { className?: string }) {
     <img
       src="/logo.svg"
       alt="Litigo"
-      width={67}
+      width={50}
       height={20}
       className={className ?? "h-5 w-auto"}
     />
