@@ -104,16 +104,42 @@ export function DashboardPreview() {
     <div aria-hidden="true" className="relative w-full px-2 sm:px-0">
       <div className="bg-muted/70 pointer-events-none absolute inset-x-6 top-6 h-[85%] rounded-[2rem] blur-3xl sm:inset-x-16" />
       <div className="bg-verified/10 pointer-events-none absolute top-0 right-[8%] h-64 w-64 rounded-full blur-3xl" />
+      {/* Bottom-corner glow, positioned via left (not a negative inset) so
+          it extends inward and can't push the wrapper wider than its own
+          bounds — sits in the extra padding the fade needs anyway, so the
+          empty space it leaves behind reads as deliberate, not dead. */}
+      <div className="bg-verified/8 pointer-events-none absolute bottom-0 left-[3%] h-56 w-56 rounded-full blur-3xl" />
 
-      {/* The bottom edge fades to transparent instead of ending in a hard
-          border/shadow line — border, shadow, and content all dissolve
-          together (mask-image affects the whole painted box, not just its
-          background), so the window reads as "continues beyond what's
-          shown" rather than a cropped screenshot. The fade distance (120px
-          on narrow viewports, 170px from sm up) is deliberately smaller
-          than the extra bottom padding added to the content below, so it
-          only ever eats into empty space — never a card or panel. */}
-      <div className="border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_32px_64px_-20px_rgba(0,0,0,0.18)] relative mx-auto w-full overflow-hidden rounded-2xl border [mask-image:linear-gradient(to_bottom,black,black_calc(100%-120px),transparent)] [-webkit-mask-image:linear-gradient(to_bottom,black,black_calc(100%-120px),transparent)] sm:[mask-image:linear-gradient(to_bottom,black,black_calc(100%-170px),transparent)] sm:[-webkit-mask-image:linear-gradient(to_bottom,black,black_calc(100%-170px),transparent)]">
+      {/* The dissolve is confined to the last ~18% of the card's height —
+          a percentage-based mask, so it scales with whatever the content's
+          actual height turns out to be instead of a fixed pixel distance
+          from the bottom. Kept deliberately late (not starting until 82%)
+          so the entire first viewport — everything visible before a user
+          scrolls — stays fully opaque and crisp; only the trailing panels
+          dissolve, not the header/sidebar/Continue-working area anyone
+          actually looks at first.
+
+          Vertical-only, deliberately: an earlier version also faded the
+          left/right edges (to mask a ~10% scale-up bleeding past the
+          viewport), but that horizontal gradient doesn't vary by row, so
+          it faded the sidebar/header edges too, not just the trailing
+          content — reverted the scale along with it rather than leave a
+          hard crop at the sides with no fade to soften it. */}
+      {/* A soft green halo tracing just outside the card's own rounded
+          corners — sits behind it (earlier in paint order) at a size that
+          hugs the full perimeter, not just one corner, for a premium
+          "glowing from behind" feel rather than an isolated accent. */}
+      <div
+        aria-hidden="true"
+        className="bg-verified/6 pointer-events-none absolute -inset-3 rounded-[1.75rem] blur-2xl sm:-inset-4"
+      />
+      <div
+        className="border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_32px_64px_-20px_rgba(0,0,0,0.18)] relative mx-auto w-full overflow-hidden rounded-2xl border"
+        style={{
+          maskImage: "linear-gradient(to bottom, black 82%, transparent 99%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 82%, transparent 99%)",
+        }}
+      >
         {/* Browser chrome */}
         <div className="border-border bg-muted/40 flex items-center gap-1.5 border-b px-4 py-2.5">
           <span className="bg-muted-foreground/20 size-2.5 rounded-full" />
@@ -161,7 +187,7 @@ export function DashboardPreview() {
           </div>
 
           {/* Main content — mirrors src/app/dashboard/page.tsx */}
-          <div className="min-w-0 flex-1 px-4 pt-8 pb-36 sm:px-8 sm:pb-52">
+          <div className="min-w-0 flex-1 px-4 pt-8 pb-10 sm:px-8 sm:pb-14">
             <div className="flex flex-col gap-6">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
