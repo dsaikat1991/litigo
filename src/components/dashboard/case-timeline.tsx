@@ -14,6 +14,21 @@ function Section({ label, value }: { label: string; value: string | null }) {
   );
 }
 
+// Day and month/year are split into two lines (rather than reusing the
+// single-string formatDate) so the left rail reads like a compact date
+// stamp instead of a long label fighting the card next to it for width.
+function EventDate({ iso, locale, timeZone }: { iso: string; locale: string; timeZone: string }) {
+  const date = new Date(iso);
+  return (
+    <div className="text-right">
+      <p className="text-sm font-semibold">{date.toLocaleDateString(locale, { day: "numeric", timeZone })}</p>
+      <p className="text-muted-foreground text-xs">
+        {date.toLocaleDateString(locale, { month: "short", year: "numeric", timeZone })}
+      </p>
+    </div>
+  );
+}
+
 export function CaseTimeline({
   events,
   locale,
@@ -28,23 +43,31 @@ export function CaseTimeline({
   }
 
   return (
-    <ol className="flex flex-col gap-3">
-      {events.map((event) => {
+    <ol className="flex flex-col">
+      {events.map((event, i) => {
         const Icon = CASE_EVENT_TYPE_ICONS[event.event_type];
+        const isLast = i === events.length - 1;
         return (
-          <li key={event.id} className="flex gap-3 rounded-lg border p-4">
-            <Icon className="text-muted-foreground mt-0.5 size-4 shrink-0" />
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="font-normal">
-                    {CASE_EVENT_TYPE_LABELS[event.event_type]}
-                  </Badge>
-                  <p className="text-sm font-medium">{event.title}</p>
-                </div>
-                <span className="text-muted-foreground shrink-0 text-xs">
-                  {formatDate(event.event_date, locale, timeZone)}
-                </span>
+          <li key={event.id} className="grid grid-cols-[5rem_1.5rem_1fr] gap-x-3">
+            <div className="pt-3">
+              <EventDate iso={event.event_date} locale={locale} timeZone={timeZone} />
+            </div>
+
+            {/* Rail: a dot marking this event, on a continuous vertical line
+                shared by every event except the last, whose line has
+                nothing left to connect to. */}
+            <div className="relative flex justify-center">
+              <span className="border-foreground/60 bg-background mt-4 size-2.5 shrink-0 rounded-full border-2" />
+              {!isLast && <span className="bg-border absolute top-4 bottom-0 left-1/2 w-px -translate-x-1/2" />}
+            </div>
+
+            <div className={`flex min-w-0 flex-col gap-2 rounded-lg border p-4 ${isLast ? "" : "mb-4"}`}>
+              <div className="flex flex-wrap items-center gap-2">
+                <Icon className="text-muted-foreground size-4 shrink-0" />
+                <Badge variant="outline" className="font-normal">
+                  {CASE_EVENT_TYPE_LABELS[event.event_type]}
+                </Badge>
+                <p className="text-sm font-medium">{event.title}</p>
               </div>
 
               {(event.stage || event.hearing_purpose) && (

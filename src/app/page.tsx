@@ -1,11 +1,8 @@
 import Link from "next/link";
-import { EyeOff, Lock, Play, PenLine } from "lucide-react";
+import { ArrowLeft, EyeOff, Lock, Play, PenLine, Zap } from "lucide-react";
 import { DashboardPreview } from "@/components/marketing/dashboard-preview";
 import { MemorySearchPreview } from "@/components/marketing/memory-search-preview";
 import {
-  CaptureIcon,
-  BuildIcon,
-  FindIcon,
   SearchDepthIcon,
   CompoundGrowthIcon,
   OwnershipIcon,
@@ -13,24 +10,83 @@ import {
 } from "@/components/marketing/capture-build-find";
 import { SiteHeader } from "@/components/marketing/site-header";
 
+// `href: null` marks a page that doesn't exist yet — rendered as plain
+// text rather than a link so the footer never points somewhere that 404s.
+// Swap in a real href once each page is built.
+const FOOTER_COLUMNS = [
+  {
+    title: "Product",
+    links: [
+      { href: null, label: "Features" },
+      { href: null, label: "Pricing" },
+      { href: null, label: "Security" },
+      { href: null, label: "Changelog" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { href: "/about", label: "About" },
+      { href: null, label: "Our Story" },
+      { href: null, label: "Careers" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { href: null, label: "Blog" },
+      { href: null, label: "Documentation" },
+      { href: null, label: "Help Centre" },
+      { href: null, label: "Product Updates" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { href: "/terms", label: "Terms of Service" },
+      { href: "/privacy", label: "Privacy Policy" },
+      { href: null, label: "Cookie Policy" },
+      { href: null, label: "Security Policy" },
+      { href: null, label: "Data Processing Agreement (DPA)" },
+      { href: null, label: "Acceptable Use Policy" },
+      { href: null, label: "AI Transparency" },
+    ],
+  },
+] as const;
+
+// Social handles don't exist yet — rendered as plain (non-linking) icon
+// tiles until real profiles are created, same placeholder convention as
+// the FOOTER_COLUMNS links above.
+const SOCIAL_LINKS = [
+  { label: "LinkedIn", initials: "in" },
+  { label: "Facebook", initials: "f" },
+  { label: "Instagram", initials: "ig" },
+  { label: "YouTube", initials: "yt" },
+] as const;
+
+// These SVGs each fill their own viewBox with no meaningful padding, so
+// (unlike the earlier revision of these files) a single shared height is
+// enough to make all three read as the same size — no per-icon
+// compensation needed.
 const STEPS = [
   {
     number: "01",
-    Icon: CaptureIcon,
+    icon: "/icons/capture_legal_knowledge.svg",
     title: "Capture what matters.",
     description:
       "Log the argument, the research, the outcome — in the moment, not reconstructed from memory months later.",
   },
   {
     number: "02",
-    Icon: BuildIcon,
+    icon: "/icons/litigation_memory.svg",
     title: "Build your litigation memory.",
     description:
       "Everything you capture becomes part of one growing record, linked to the matter it came from.",
   },
   {
     number: "03",
-    Icon: FindIcon,
+    icon: "/icons/search.svg",
     title: "Find it when it matters most.",
     description:
       "Search across every case at once — the fact you need is always one query away.",
@@ -88,11 +144,7 @@ export default function Home() {
       <SiteHeader />
 
       <main className="flex flex-1 flex-col gap-14 overflow-x-hidden sm:gap-20">
-        <div className="relative mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-4 pt-28 text-left sm:px-8 sm:pt-40 lg:pt-48">
-          <div
-            aria-hidden="true"
-            className="bg-verified/10 pointer-events-none absolute top-0 left-0 h-[32rem] w-[32rem] rounded-full blur-3xl"
-          />
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-4 pt-28 text-left sm:px-8 sm:pt-40 lg:pt-48">
           <h1 className="text-[2.4rem] leading-[1.3] font-bold tracking-tight sm:text-[3.2rem] lg:text-[4rem]">
             Your legal memory, finally
             <br />
@@ -119,20 +171,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="-mt-2 mx-auto w-full max-w-[99rem] px-2 sm:px-4">
+        <div className="mt-[22px] mx-auto w-full max-w-[99rem] px-2 sm:px-4">
           <DashboardPreview />
         </div>
 
-        <div className="relative mt-2 border-b">
-          {/* Bridges the dashboard's own fade-out into this section instead
-              of a flat, empty gap between them — same ambient-glow language
-              used at the hero and around the dashboard card, just extended
-              into the one transition on the page that didn't have it yet. */}
-          <div
-            aria-hidden="true"
-            className="bg-verified/8 pointer-events-none absolute inset-x-0 -top-16 mx-auto h-56 w-56 rounded-full blur-3xl"
-          />
-          <div className="relative mx-auto flex w-full max-w-6xl flex-col items-start gap-6 pt-6 pb-14 px-4 text-left sm:px-8 sm:pt-8 sm:pb-20">
+        <div className="mt-2 border-b">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 pt-6 pb-14 px-4 text-left sm:px-8 sm:pt-8 sm:pb-20">
             <h2 className="max-w-5xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
               Your legal experience compounds with every case.
             </h2>
@@ -152,7 +196,6 @@ export default function Home() {
                 divider instead. */}
             <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-3 sm:gap-x-0">
               {STEPS.map((step, i) => {
-                const Icon = step.Icon;
                 const paddingClass =
                   i === 0 ? "sm:pr-10" : i === STEPS.length - 1 ? "sm:border-l sm:border-border sm:pl-10" : "sm:border-l sm:border-border sm:px-10";
                 return (
@@ -163,7 +206,8 @@ export default function Home() {
                     <span className="font-mono text-muted-foreground/50 text-xs tracking-wider">
                       {step.number}
                     </span>
-                    <Icon className="text-foreground/80 h-40 w-auto self-center" />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, no benefit from next/image's optimization pipeline */}
+                    <img src={step.icon} alt="" className="h-[252px] w-auto self-center" />
                     <h3 className="text-lg font-bold tracking-tight">{step.title}</h3>
                     <p className="font-manrope text-muted-foreground/80 text-sm leading-relaxed">
                       {step.description}
@@ -258,69 +302,116 @@ export default function Home() {
         </div>
 
         {/* Closing CTA — the page had no final call-to-action before this;
-            it just ended after the last content section. A soft verified
-            tint (not a new color, same token used at low opacity
-            elsewhere) marks it as the page's closing beat before the
-            footer, without needing a hard border to separate it. */}
-        <div className="bg-verified/5 border-t">
-          <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 px-4 py-20 text-center sm:px-8 sm:py-28">
-            <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-              Your legal memory starts with the next case you open.
+            it just ended after the last content section. Kept strictly
+            monochrome (no verified-green accent) so it reads as one more
+            beat in the same family as the isometric icon sections, not a
+            promotional band breaking from them. */}
+        <div className="border-t">
+          <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 px-4 pt-20 pb-4 text-center sm:px-8 sm:pt-28">
+            <span className="border-border inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
+              <Zap className="size-3" />
+              Start in 2 minutes
+            </span>
+            <h2 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+              Your next case is
+              <br />
+              where it begins.
             </h2>
             <p className="font-manrope text-muted-foreground max-w-md text-lg leading-relaxed text-balance">
-              Two minutes to set up. No credit card, no migration, no new habit to learn.
+              Create your first matter in minutes and start building a legal memory you&apos;ll
+              rely on for years.
             </p>
-            <Link
-              href="/signup"
-              className="bg-foreground text-background mt-2 rounded-lg px-6 py-3 text-sm font-medium"
-            >
-              Start building your memory
-            </Link>
+
+            <div className="relative mt-2 flex justify-center">
+              <Link
+                href="/signup"
+                className="bg-foreground text-background inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium"
+              >
+                <Zap className="size-4 fill-current" />
+                Start building your legal memory
+              </Link>
+              {/* Positioned relative to the button's own centered wrapper
+                  (not stacked in the flex row) so this annotation can sit
+                  off to the side without pulling the button off-center. */}
+              <div className="text-muted-foreground absolute top-1/2 left-full ml-4 hidden -translate-y-1/2 items-center gap-2 sm:flex">
+                <ArrowLeft className="size-4 shrink-0" />
+                <p className="-rotate-2 text-left text-xs leading-snug whitespace-nowrap italic">
+                  No credit card.
+                  <br />
+                  No migration.
+                  <br />
+                  No new habit to learn.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* A decorative map of what accumulates in a legal memory —
+              research, orders, arguments, lessons — converging on the
+              Litigo mark. Purely illustrative (aria-hidden); the CTA above
+              already states the same idea in words. */}
+          {/* The cube's base is cropped off with a hard cut rather than
+              re-exporting the file: the image renders at its full natural
+              size, but the wrapper is shorter and clips (overflow-hidden)
+              so the cube's bottom simply doesn't render past the footer
+              divider — no gradient, no fade. */}
+          <div className="mx-auto w-full max-w-5xl overflow-hidden px-4 sm:px-8" style={{ aspectRatio: "1228 / 400" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, no benefit from next/image's optimization pipeline */}
+            <img src="/icons/bottomCTA.svg" alt="" aria-hidden="true" className="w-full" style={{ aspectRatio: "1228 / 549" }} />
           </div>
         </div>
       </main>
 
-      <footer className="border-t px-4 py-6 sm:px-8">
-        <div className="flex flex-col items-center gap-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-          <nav className="order-2 flex items-center gap-4 sm:order-1 sm:justify-self-start">
-            <Link
-              href="/about"
-              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
-            >
-              About
+      <footer className="border-t px-4 py-12 sm:px-8">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
+          <div className="flex flex-col gap-10 sm:flex-row sm:items-start sm:justify-between">
+            <Link href="/" className="shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, no benefit from next/image's optimization pipeline */}
+              <img src="/mark.svg" alt="Litigo" width={32} height={32} className="size-8 rounded-md" />
             </Link>
-            <Link
-              href="/how-it-works"
-              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
-            >
-              How It Works
-            </Link>
-          </nav>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-5 sm:gap-x-10">
+              {FOOTER_COLUMNS.map((column) => (
+                <div key={column.title} className="flex flex-col gap-3">
+                  <p className="text-sm font-semibold">{column.title}</p>
+                  <nav className="flex flex-col gap-2.5">
+                    {column.links.map((link) =>
+                      link.href ? (
+                        <Link
+                          key={link.label}
+                          href={link.href}
+                          className="text-muted-foreground hover:text-foreground text-sm"
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <span key={link.label} className="text-muted-foreground text-sm">
+                          {link.label}
+                        </span>
+                      ),
+                    )}
+                  </nav>
+                </div>
+              ))}
 
-          <p className="order-1 text-center text-xs tracking-widest text-muted-foreground uppercase sm:order-2">
-            We believe legal experience should compound, not disappear.
+              <div className="flex flex-col gap-3">
+                <p className="text-sm font-semibold">Connect</p>
+                <div className="flex items-center gap-2">
+                  {SOCIAL_LINKS.map((social) => (
+                    <span
+                      key={social.label}
+                      aria-label={social.label}
+                      className="border-border text-muted-foreground flex size-8 items-center justify-center rounded-md border text-xs font-medium"
+                    >
+                      {social.initials}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            &copy; {new Date().getFullYear()} Litigo. All rights reserved.
           </p>
-
-          <nav className="order-3 flex items-center gap-4 sm:justify-self-end">
-            <Link
-              href="/terms"
-              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
-            >
-              Terms
-            </Link>
-            <Link
-              href="/privacy"
-              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
-            >
-              Privacy
-            </Link>
-            <Link
-              href="/contact"
-              className="text-muted-foreground hover:text-foreground text-xs uppercase tracking-widest"
-            >
-              Contact
-            </Link>
-          </nav>
         </div>
       </footer>
     </div>

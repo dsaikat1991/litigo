@@ -182,10 +182,6 @@ export function MemorySearchPreview() {
 
   return (
     <div className="relative flex items-center justify-center py-6">
-      <div
-        aria-hidden
-        className="bg-verified/15 pointer-events-none absolute h-[32rem] w-[32rem] rounded-full blur-2xl"
-      />
       <div className="bg-card border-border relative w-full max-w-4xl overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgba(0,0,0,0.04),0_24px_56px_-16px_rgba(0,0,0,0.18)]">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Left: search + timeline results */}
