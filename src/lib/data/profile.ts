@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { ProfessionalLicence } from "@/lib/types";
+import type { NotificationPreferences, ProfessionalLicence } from "@/lib/types";
 
 export interface CurrentProfile {
   id: string;
@@ -103,4 +103,35 @@ export async function getUserPracticeAreaIds(): Promise<string[]> {
     .eq("user_id", user.id);
 
   return (data ?? []).map((row) => row.practice_area_id);
+}
+
+export async function getNotificationPreferences(): Promise<NotificationPreferences> {
+  const allEnabled: NotificationPreferences = {
+    "7_day": { in_app: true, email: true },
+    "3_day": { in_app: true, email: true },
+    "1_day": { in_app: true, email: true },
+    same_day: { in_app: true, email: true },
+  };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return allEnabled;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select(
+      "notify_7_day_in_app, notify_7_day_email, notify_3_day_in_app, notify_3_day_email, notify_1_day_in_app, notify_1_day_email, notify_same_day_in_app, notify_same_day_email",
+    )
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile) return allEnabled;
+
+  return {
+    "7_day": { in_app: profile.notify_7_day_in_app, email: profile.notify_7_day_email },
+    "3_day": { in_app: profile.notify_3_day_in_app, email: profile.notify_3_day_email },
+    "1_day": { in_app: profile.notify_1_day_in_app, email: profile.notify_1_day_email },
+    same_day: { in_app: profile.notify_same_day_in_app, email: profile.notify_same_day_email },
+  };
 }

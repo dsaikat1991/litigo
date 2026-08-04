@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 async function getOrigin(): Promise<string> {
   const headersList = await headers();
@@ -126,4 +127,74 @@ export async function updatePassword(formData: FormData) {
   }
 
   redirect("/dashboard");
+}
+
+// One combined Save covering both fields — only acts on whichever actually
+// changed (email left as-is submits unchanged; password left blank means
+// "don't change it"), then redirects with whichever banner(s) apply. Email
+// and password are still two independent Supabase Auth calls under the
+// hood (different consequences — email needs confirmation via link sent to
+// both addresses, password takes effect immediately), just triggered by one
+// button instead of two.
+export async function updateAccountDetails(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const newEmail = String(formData.get("email") ?? "").trim();
+  const newPassword = String(formData.get("password") ?? "");
+  const emailChanged = !!newEmail && newEmail.toLowerCase() !== (user.email ?? "").toLowerCase();
+  const passwordChanged = newPassword.length > 0;
+
+  if (passwordChanged && newPassword.length < 6) {
+    redirect(`/dashboard/settings?error=${encodeURIComponent("Password must be at least 6 characters")}`);
+  }
+
+  if (emailChanged) {
+    const origin = await getOrigin();
+    const { error } = await supabase.auth.updateUser(
+      { email: newEmail },
+      { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/dashboard/settings?emailChanged=1")}` },
+    );
+    if (error) {
+      redirect(`/dashboard/settings?error=${encodeURIComponent(error.message)}`);
+    }
+  }
+
+  if (passwordChanged) {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      redirect(`/dashboard/settings?error=${encodeURIComponent(error.message)}`);
+    }
+  }
+
+  const params = new URLSearchParams();
+  if (emailChanged) params.set("emailPending", "1");
+  if (passwordChanged) params.set("passwordChanged", "1");
+  redirect(`/dashboard/settings?${params.toString()}`);
+}
+
+export async function deleteAccount() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  // The id that gets deleted comes only from this verified session — never
+  // from anything client-supplied — so this can only ever delete the
+  // caller's own account, despite needing the admin client to do it at all
+  // (there's no non-admin "delete yourself" API).
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.deleteUser(user.id);
+  if (error) {
+    redirect(`/dashboard/settings?error=${encodeURIComponent(error.message)}`);
+  }
+
+  // Best-effort — the user row is already gone at this point, this just
+  // clears the now-dangling session cookie.
+  await supabase.auth.signOut();
+  redirect("/login?deleted=1");
 }

@@ -1,9 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signOut } from "@/lib/actions/auth";
+import { useSignOut } from "@/components/dashboard/use-sign-out";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -23,20 +21,7 @@ export function HeaderProfileMenu({
   fullName: string | null;
   email: string | null;
 }) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
-
-  // Explicit client-driven navigation, not signOut()'s own redirect() — see
-  // the comment on that action for why. Pushed only after signOut()
-  // resolves (session actually cleared), not before: pushing earlier risks
-  // the /login request landing while the old session cookie is still valid,
-  // which the auth middleware would just bounce straight back to /dashboard.
-  function handleSignOut() {
-    startTransition(async () => {
-      await signOut();
-      router.push("/login");
-    });
-  }
+  const handleSignOut = useSignOut();
 
   return (
     <div className="flex items-center gap-1">

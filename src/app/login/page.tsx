@@ -15,9 +15,9 @@ import {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; deleted?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, deleted } = await searchParams;
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-16">
@@ -27,6 +27,11 @@ export default async function LoginPage({
           <CardDescription>Sign in to your legal memory.</CardDescription>
         </CardHeader>
         <CardContent>
+          {deleted && (
+            <p className="border-verified/30 bg-verified/10 text-verified mb-4 rounded-lg border px-3 py-2 text-sm">
+              Your account has been deleted.
+            </p>
+          )}
           <GoogleSignInButton />
 
           <div className="my-6 flex items-center gap-3">
