@@ -3,14 +3,20 @@ import { CalendarClock, Milestone } from "lucide-react";
 import { getArgumentNotes, getCaseById, getCaseOptions, getResearchNotes } from "@/lib/data/cases";
 import { getCaseEvents } from "@/lib/data/case-events";
 import { getMemories } from "@/lib/data/memories";
+import { getDocuments } from "@/lib/data/documents";
+import { getTasks } from "@/lib/data/tasks";
 import { getCurrentProfile } from "@/lib/data/profile";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddArgumentNoteForm } from "@/components/dashboard/add-argument-note-form";
 import { AddResearchNoteForm } from "@/components/dashboard/add-research-note-form";
 import { AddMemoryForm } from "@/components/dashboard/add-memory-form";
+import { UploadDocumentForm } from "@/components/dashboard/upload-document-form";
+import { AddTaskForm } from "@/components/dashboard/add-task-form";
 import { ArgumentNoteList, ResearchNoteList } from "@/components/dashboard/note-list";
 import { MemoryList } from "@/components/dashboard/memory-list";
+import { DocumentList } from "@/components/dashboard/document-list";
+import { TaskList } from "@/components/dashboard/task-list";
 import { CaseTimeline } from "@/components/dashboard/case-timeline";
 import { RecordHearingDialog } from "@/components/dashboard/record-hearing-dialog";
 import { EditCaseDialog } from "@/components/dashboard/edit-case-dialog";
@@ -26,16 +32,25 @@ export default async function CaseDetailPage({
   const caseItem = await getCaseById(id);
   if (!caseItem) notFound();
 
-  const [argumentNotes, researchNotes, memories, profile, caseOptions, caseEvents] = await Promise.all([
-    getArgumentNotes(id),
-    getResearchNotes(id),
-    getMemories({ caseId: id }),
-    getCurrentProfile(),
-    getCaseOptions(),
-    getCaseEvents(id),
-  ]);
+  const [argumentNotes, researchNotes, memories, documents, tasks, profile, caseOptions, caseEvents] =
+    await Promise.all([
+      getArgumentNotes(id),
+      getResearchNotes(id),
+      getMemories({ caseId: id }),
+      getDocuments({ caseId: id }),
+      getTasks(id),
+      getCurrentProfile(),
+      getCaseOptions(),
+      getCaseEvents(id),
+    ]);
   const locale = profile?.locale ?? "en-IN";
   const timeZone = profile?.timezone ?? "Asia/Kolkata";
+  const hearingOptions = caseEvents
+    .filter((e) => e.event_type === "hearing")
+    .map((e) => ({
+      id: e.id,
+      label: `${formatDate(e.event_date, locale, timeZone)}${e.title ? ` — ${e.title}` : ""}`,
+    }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -95,6 +110,8 @@ export default async function CaseDetailPage({
           <TabsTrigger value="arguments">Arguments</TabsTrigger>
           <TabsTrigger value="research">Research</TabsTrigger>
           <TabsTrigger value="memory">Memory</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="tasks">Tasks</TabsTrigger>
         </TabsList>
         <TabsContent value="timeline" className="flex flex-col gap-4">
           <CaseTimeline events={caseEvents} locale={locale} timeZone={timeZone} />
@@ -116,6 +133,19 @@ export default async function CaseDetailPage({
             locale={locale}
             timeZone={timeZone}
           />
+        </TabsContent>
+        <TabsContent value="documents" className="flex flex-col gap-4">
+          <UploadDocumentForm caseId={id} />
+          <DocumentList
+            documents={documents}
+            emptyLabel="No documents uploaded on this case yet."
+            locale={locale}
+            timeZone={timeZone}
+          />
+        </TabsContent>
+        <TabsContent value="tasks" className="flex flex-col gap-4">
+          <AddTaskForm caseId={id} />
+          <TaskList tasks={tasks} locale={locale} timeZone={timeZone} hearingOptions={hearingOptions} />
         </TabsContent>
       </Tabs>
     </div>

@@ -116,7 +116,7 @@ export function SearchBar({
         }}
         className="relative"
       >
-        <div className="flex items-center gap-2.5 rounded-xl border px-4 py-3.5 focus-within:border-foreground">
+        <div className="border-border flex items-center gap-2.5 rounded-xl border px-4 py-3.5">
           <Search className="text-muted-foreground size-[17px] shrink-0" />
           <input
             type="text"

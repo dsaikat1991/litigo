@@ -7,14 +7,28 @@ async function attachCounts(supabase: SupabaseClient, cases: Case[]): Promise<Ca
   if (cases.length === 0) return [];
 
   const caseIds = cases.map((c) => c.id);
-  const [argumentRows, researchRows, memoryRows] = await Promise.all([
+  const [argumentRows, researchRows, memoryRows, documentRows, orderRows] = await Promise.all([
     supabase.from("argument_notes").select("case_id").in("case_id", caseIds),
     supabase.from("research_notes").select("case_id").in("case_id", caseIds),
-    supabase.from("memories").select("case_id").in("case_id", caseIds),
+    // Ordered newest-first and carrying content/created_at (not just
+    // case_id) so the same query serves both the count below and
+    // `latest_memory` — the first row seen per case_id, in this order,
+    // is that case's most recent memory. There's no index supporting a
+    // "latest per group" query server-side, so this reduces client-side
+    // rather than adding a second round trip.
+    supabase
+      .from("memories")
+      .select("id, case_id, content, created_at")
+      .in("case_id", caseIds)
+      .order("created_at", { ascending: false }),
+    supabase.from("hearing_documents").select("case_id").in("case_id", caseIds),
+    supabase.from("case_events").select("case_id").eq("event_type", "order").in("case_id", caseIds),
   ]);
   if (argumentRows.error) throw argumentRows.error;
   if (researchRows.error) throw researchRows.error;
   if (memoryRows.error) throw memoryRows.error;
+  if (documentRows.error) throw documentRows.error;
+  if (orderRows.error) throw orderRows.error;
 
   const countBy = (rows: { case_id: string | null }[]) => {
     const map = new Map<string, number>();
@@ -27,12 +41,27 @@ async function attachCounts(supabase: SupabaseClient, cases: Case[]): Promise<Ca
   const argumentCounts = countBy(argumentRows.data);
   const researchCounts = countBy(researchRows.data);
   const memoryCounts = countBy(memoryRows.data);
+  const documentCounts = countBy(documentRows.data);
+  const orderCounts = countBy(orderRows.data);
+
+  const latestMemoryByCase = new Map<string, { id: string; content: string; created_at: string }>();
+  for (const row of memoryRows.data) {
+    if (!row.case_id || latestMemoryByCase.has(row.case_id)) continue;
+    latestMemoryByCase.set(row.case_id, {
+      id: row.id,
+      content: row.content,
+      created_at: row.created_at,
+    });
+  }
 
   return cases.map((c) => ({
     ...c,
     argument_count: argumentCounts.get(c.id) ?? 0,
     research_count: researchCounts.get(c.id) ?? 0,
     memory_count: memoryCounts.get(c.id) ?? 0,
+    document_count: documentCounts.get(c.id) ?? 0,
+    order_count: orderCounts.get(c.id) ?? 0,
+    latest_memory: latestMemoryByCase.get(c.id) ?? null,
   }));
 }
 

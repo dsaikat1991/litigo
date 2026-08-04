@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Pencil } from "lucide-react";
 import { updateCase } from "@/lib/actions/cases";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ import type { Case, CaseStatus } from "@/lib/types";
 
 const NATURE_OF_DECISION_OPTIONS = ["Judgment", "Order", "Decree", "Settlement", "Withdrawn"];
 
-export function EditCaseDialog({ caseItem }: { caseItem: Case }) {
+export function EditCaseDialog({ caseItem, trigger }: { caseItem: Case; trigger?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [reflectionOpen, setReflectionOpen] = useState(false);
   const [status, setStatus] = useState<CaseStatus>(caseItem.status);
@@ -62,9 +62,11 @@ export function EditCaseDialog({ caseItem }: { caseItem: Case }) {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="icon" aria-label="Edit case">
-            <Pencil />
-          </Button>
+          {trigger ?? (
+            <Button variant="outline" size="icon" aria-label="Edit case">
+              <Pencil />
+            </Button>
+          )}
         </DialogTrigger>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>

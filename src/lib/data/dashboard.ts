@@ -7,6 +7,8 @@ export interface AttentionAlert {
   href: string;
 }
 
+export type TodaysFocusItem = AttentionAlert;
+
 export interface ReflectionCandidate {
   id: string;
   title: string;
@@ -116,6 +118,44 @@ export const getAttentionAlerts = cache(async function getAttentionAlerts(
 
   return { alerts, reflectionCandidate };
 });
+
+// A separate query from getAttentionAlerts (not a shared cache() call)
+// because the shape is different on purpose: getAttentionAlerts bundles
+// every matching case into one counted message ("3 matters have no linked
+// arguments"); this surfaces hearings due tomorrow/today per case by name,
+// since "Hearing tomorrow" only means something next to which case it is.
+//
+// Deliberately scoped to just that — date-driven, "due today" items. The
+// unlinked-memories and disposed-missing-reflection prompts that used to
+// live here moved to getKnowledgeGaps(): they're not time-sensitive, they're
+// case-knowledge-capture prompts, the same family as "last hearing has no
+// court observations" — and the disposed-reflection one duplicated what
+// ReflectionBannerAsync already shows, case by case, right below the cards.
+export async function getTodaysFocus(timeZone: string): Promise<TodaysFocusItem[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("cases")
+    .select("id, title, case_number, next_hearing_date");
+  if (error) throw error;
+
+  const todayKey = dayKey(new Date(), timeZone);
+  const tomorrowKey = dayKey(new Date(Date.now() + 86_400_000), timeZone);
+
+  const items: TodaysFocusItem[] = [];
+  for (const c of data ?? []) {
+    if (c.next_hearing_date === tomorrowKey || c.next_hearing_date === todayKey) {
+      const when = c.next_hearing_date === tomorrowKey ? "tomorrow" : "today";
+      items.push({
+        key: `hearing-${c.id}`,
+        message: `Hearing ${when} — ${c.case_number || c.title}`,
+        href: `/dashboard/cases/${c.id}`,
+      });
+    }
+  }
+
+  return items;
+}
 
 interface NoteRow {
   id: string;
@@ -236,4 +276,172 @@ export async function getPracticeInsights(): Promise<PracticeInsights> {
     mostUsedTag,
     argumentsWorkedCount: argOutcomeRes.count ?? 0,
   };
+}
+
+export interface KnowledgeGapItem {
+  key: string;
+  message: string;
+  cta: string;
+  href: string;
+}
+
+// Surfaces a short, capped list of specific unfinished-knowledge prompts —
+// deliberately not exhaustive (this is a glance-at card, not a queue).
+// Reuses the same "closing lesson" concept as ReflectionBannerAsync, but
+// that banner only ever shows the single most-pressing candidate; this can
+// list several at once, plus a second prompt type (a recorded hearing with
+// no court direction captured) that nothing else on the page surfaces.
+export async function getKnowledgeGaps(): Promise<KnowledgeGapItem[]> {
+  const supabase = await createClient();
+
+  const [casesRes, eventsRes, memRes] = await Promise.all([
+    supabase.from("cases").select("id, title, status"),
+    supabase
+      .from("case_events")
+      .select("case_id, event_date, court_direction")
+      .order("event_date", { ascending: false })
+      .order("created_at", { ascending: false }),
+    supabase.from("memories").select("case_id, tags"),
+  ]);
+  if (casesRes.error) throw casesRes.error;
+  if (eventsRes.error) throw eventsRes.error;
+  if (memRes.error) throw memRes.error;
+
+  const cases = casesRes.data ?? [];
+  const memories = memRes.data ?? [];
+
+  // First event seen per case_id, in this (newest-first) order, is that
+  // case's latest — same reduction used for HearingDiaryEntry in
+  // case-events.ts, just with a narrower column selection here since only
+  // court_direction's presence matters, not the whole event.
+  const latestEventByCase = new Map<string, { court_direction: string | null }>();
+  for (const event of eventsRes.data ?? []) {
+    if (!latestEventByCase.has(event.case_id)) {
+      latestEventByCase.set(event.case_id, { court_direction: event.court_direction });
+    }
+  }
+
+  const lessonCaseIds = new Set(
+    memories.filter((m) => m.tags?.includes("lesson") && m.case_id).map((m) => m.case_id as string),
+  );
+
+  const items: KnowledgeGapItem[] = [];
+  const cap = 4;
+
+  // Moved here from getTodaysFocus: not time-sensitive, so it doesn't
+  // belong under "today's" anything — it's the same "capture this
+  // knowledge" family as the two prompts below.
+  const unlinkedMemories = memories.filter((m) => !m.case_id);
+  if (unlinkedMemories.length > 0) {
+    const n = unlinkedMemories.length;
+    items.push({
+      key: "unlinked-memories",
+      message: `${n} ${n === 1 ? "memory is" : "memories are"} not linked to any case.`,
+      cta: "Link them now",
+      href: "/dashboard/memories",
+    });
+  }
+
+  for (const c of cases) {
+    if (items.length >= cap) break;
+    if (c.status === "disposed" && !lessonCaseIds.has(c.id)) {
+      items.push({
+        key: `lesson-${c.id}`,
+        message: `${c.title}: matter disposed.`,
+        cta: "What did this case teach you?",
+        href: `/dashboard/cases/${c.id}`,
+      });
+    }
+  }
+
+  for (const c of cases) {
+    if (items.length >= cap) break;
+    if (c.status !== "ongoing") continue;
+    const latest = latestEventByCase.get(c.id);
+    if (latest && !latest.court_direction) {
+      items.push({
+        key: `observation-${c.id}`,
+        message: `${c.title}: last hearing has no court observations.`,
+        cta: "Capture now",
+        href: `/dashboard/cases/${c.id}`,
+      });
+    }
+  }
+
+  return items;
+}
+
+export interface RecentArgumentIssue {
+  issue: string;
+  lastUsedAt: string;
+}
+
+// Distinct argument `issue` values, most-recently-used first — "recently
+// used," not "most used": frequency ranking is a different, separately
+// useful view (see getMonthlyArgumentInsight below), not this one.
+export async function getRecentArgumentIssues(limit = 5): Promise<RecentArgumentIssue[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("argument_notes")
+    .select("issue, created_at")
+    .not("issue", "is", null)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+
+  const seen = new Map<string, string>();
+  for (const row of data ?? []) {
+    const issue = row.issue?.trim();
+    if (!issue || seen.has(issue)) continue;
+    seen.set(issue, row.created_at);
+    if (seen.size >= limit) break;
+  }
+
+  return Array.from(seen, ([issue, lastUsedAt]) => ({ issue, lastUsedAt }));
+}
+
+export interface MonthlyArgumentInsight {
+  issue: string;
+  matterCount: number;
+}
+
+// The one argument `issue` used across the most *distinct* matters this
+// calendar month (in the viewer's own time zone) — "you argued X in N
+// different matters" only means something as a prompt toward reusable
+// notes if N counts matters, not raw argument-note rows (arguing the same
+// issue five times in one matter isn't the same signal as five matters).
+// Returns null below the "worth reusing" threshold of 2 distinct matters.
+export async function getMonthlyArgumentInsight(timeZone: string): Promise<MonthlyArgumentInsight | null> {
+  const supabase = await createClient();
+
+  const now = new Date();
+  const monthStart = new Date(
+    now.toLocaleString("en-US", { timeZone }),
+  );
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from("argument_notes")
+    .select("issue, case_id")
+    .not("issue", "is", null)
+    .not("case_id", "is", null)
+    .gte("created_at", monthStart.toISOString());
+  if (error) throw error;
+
+  const casesByIssue = new Map<string, Set<string>>();
+  for (const row of data ?? []) {
+    const issue = row.issue?.trim();
+    if (!issue || !row.case_id) continue;
+    if (!casesByIssue.has(issue)) casesByIssue.set(issue, new Set());
+    casesByIssue.get(issue)!.add(row.case_id);
+  }
+
+  let best: MonthlyArgumentInsight | null = null;
+  for (const [issue, caseIds] of casesByIssue) {
+    if (!best || caseIds.size > best.matterCount) {
+      best = { issue, matterCount: caseIds.size };
+    }
+  }
+
+  return best && best.matterCount >= 2 ? best : null;
 }

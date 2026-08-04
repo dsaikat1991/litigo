@@ -13,7 +13,7 @@ export function ReflectionBanner({ caseId, caseTitle }: { caseId: string; caseTi
 
   return (
     <>
-      <div className="bg-muted/40 flex items-start gap-3 rounded-xl border p-4">
+      <div className="bg-muted/40 flex items-start gap-3 rounded-xl p-4">
         <Bookmark className="text-muted-foreground mt-0.5 size-4 shrink-0" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium">Preserve what this case taught you</p>

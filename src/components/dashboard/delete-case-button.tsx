@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Trash2 } from "lucide-react";
 import { deleteCase } from "@/lib/actions/cases";
 import { Button } from "@/components/ui/button";
@@ -15,13 +16,23 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export function DeleteCaseButton({ caseId, title }: { caseId: string; title: string }) {
+export function DeleteCaseButton({
+  caseId,
+  title,
+  trigger,
+}: {
+  caseId: string;
+  title: string;
+  trigger?: ReactNode;
+}) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="icon" aria-label="Delete case">
-          <Trash2 />
-        </Button>
+        {trigger ?? (
+          <Button variant="destructive" size="icon" aria-label="Delete case">
+            <Trash2 />
+          </Button>
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

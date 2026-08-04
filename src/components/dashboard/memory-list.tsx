@@ -91,9 +91,10 @@ export function MemoryList({
                   <Link
                     href={`/dashboard/cases/${memory.case_id}`}
                     onClick={(e) => e.stopPropagation()}
+                    className="min-w-0 max-w-full"
                   >
-                    <Badge variant="verified" className="font-normal">
-                      {memory.case.title}
+                    <Badge variant="verified" className="max-w-full justify-start font-normal">
+                      <span className="min-w-0 truncate">{memory.case.title}</span>
                     </Badge>
                   </Link>
                 )}
@@ -215,9 +216,9 @@ export function MemoryList({
                       </Badge>
                     ))}
                     {selected.case_id && selected.case && (
-                      <Link href={`/dashboard/cases/${selected.case_id}`}>
-                        <Badge variant="verified" className="font-normal">
-                          {selected.case.title}
+                      <Link href={`/dashboard/cases/${selected.case_id}`} className="min-w-0 max-w-full">
+                        <Badge variant="verified" className="max-w-full justify-start font-normal">
+                          <span className="min-w-0 truncate">{selected.case.title}</span>
                         </Badge>
                       </Link>
                     )}
