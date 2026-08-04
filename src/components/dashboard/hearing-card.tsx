@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Landmark, Milestone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { HearingTaskToggle } from "@/components/dashboard/hearing-task-toggle";
+import { TaskToggle } from "@/components/dashboard/task-toggle";
 import { RecordHearingDialog } from "@/components/dashboard/record-hearing-dialog";
 import { caseStatusBadgeVariant, formatDate } from "@/lib/utils";
 import type { HearingDiaryEntry } from "@/lib/types";
@@ -60,7 +60,7 @@ export function HearingCard({
               Pending preparation
             </p>
             {pendingTasks.map((task) => (
-              <HearingTaskToggle key={task.id} task={task} />
+              <TaskToggle key={task.id} task={task} />
             ))}
           </div>
         )}

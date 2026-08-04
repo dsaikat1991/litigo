@@ -1,6 +1,6 @@
 import { CASE_EVENT_TYPE_ICONS, CASE_EVENT_TYPE_LABELS } from "@/lib/case-event-meta";
 import { Badge } from "@/components/ui/badge";
-import { HearingTaskToggle } from "@/components/dashboard/hearing-task-toggle";
+import { TaskToggle } from "@/components/dashboard/task-toggle";
 import { formatDate } from "@/lib/utils";
 import type { CaseEvent } from "@/lib/types";
 
@@ -102,7 +102,7 @@ export function CaseTimeline({
                     Tasks before next hearing
                   </p>
                   {event.tasks.map((task) => (
-                    <HearingTaskToggle key={task.id} task={task} />
+                    <TaskToggle key={task.id} task={task} />
                   ))}
                 </div>
               )}

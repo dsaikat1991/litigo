@@ -22,6 +22,8 @@ export type NotificationTiming = "7_day" | "3_day" | "1_day" | "same_day";
 export type NotificationChannel = "in_app" | "email";
 export type NotificationStatus = "pending" | "sent" | "cancelled";
 
+export type NotificationPreferences = Record<NotificationTiming, Record<NotificationChannel, boolean>>;
+
 export interface Case {
   id: string;
   owner_id: string;
@@ -43,6 +45,9 @@ export interface Case {
   argument_count?: number;
   research_count?: number;
   memory_count?: number;
+  document_count?: number;
+  order_count?: number;
+  latest_memory?: { id: string; content: string; created_at: string } | null;
 }
 
 export interface ArgumentNote {
@@ -80,12 +85,17 @@ export interface Memory {
   case?: { title: string } | null;
 }
 
-export interface HearingTask {
+export type TaskPriority = "low" | "medium" | "high";
+
+export interface Task {
   id: string;
   case_id: string;
-  event_id: string;
   owner_id: string;
-  description: string;
+  event_id: string | null;
+  title: string;
+  due_date: string | null;
+  priority: TaskPriority;
+  assignee: string | null;
   is_done: boolean;
   created_at: string;
   completed_at: string | null;
@@ -98,6 +108,18 @@ export interface HearingDocument {
   owner_id: string;
   name: string;
   created_at: string;
+}
+
+export interface CaseDocument {
+  id: string;
+  case_id: string | null;
+  owner_id: string;
+  storage_path: string;
+  file_name: string;
+  mime_type: string | null;
+  size_bytes: number | null;
+  created_at: string;
+  case?: { id: string; title: string } | null;
 }
 
 export interface CaseEvent {
@@ -116,7 +138,7 @@ export interface CaseEvent {
   next_hearing_purpose: string | null;
   created_at: string;
   updated_at: string;
-  tasks?: HearingTask[];
+  tasks?: Task[];
   documents?: HearingDocument[];
   case?: { title: string; court: string | null } | null;
 }
@@ -142,7 +164,7 @@ export interface NotificationSchedule {
 export interface HearingDiaryEntry {
   case: Case;
   latestEvent: CaseEvent | null;
-  pendingTasks: HearingTask[];
+  pendingTasks: Task[];
 }
 
 export interface ProfessionalLicence {

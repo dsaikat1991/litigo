@@ -5,8 +5,8 @@ import type {
   CaseEvent,
   HearingDiaryEntry,
   HearingDocument,
-  HearingTask,
   NotificationSchedule,
+  Task,
 } from "@/lib/types";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -37,11 +37,7 @@ export async function getCaseEvents(caseId: string): Promise<CaseEvent[]> {
 
   const eventIds = events.map((e) => e.id);
   const [tasksRes, docsRes] = await Promise.all([
-    supabase
-      .from("hearing_tasks")
-      .select("*")
-      .in("event_id", eventIds)
-      .order("created_at", { ascending: true }),
+    supabase.from("tasks").select("*").in("event_id", eventIds).order("created_at", { ascending: true }),
     supabase
       .from("hearing_documents")
       .select("*")
@@ -51,7 +47,7 @@ export async function getCaseEvents(caseId: string): Promise<CaseEvent[]> {
   if (tasksRes.error) throw tasksRes.error;
   if (docsRes.error) throw docsRes.error;
 
-  const tasksByEvent = groupBy<HearingTask>(tasksRes.data ?? [], (t) => t.event_id);
+  const tasksByEvent = groupBy<Task>(tasksRes.data ?? [], (t) => t.event_id as string);
   const docsByEvent = groupBy<HearingDocument>(docsRes.data ?? [], (d) => d.event_id);
 
   return events.map((event) => ({
@@ -81,11 +77,11 @@ async function attachDiaryContext(supabase: SupabaseClient, cases: Case[]): Prom
   const latestEventIds = [...latestEventByCase.values()].map((e) => e.id);
   const { data: tasks, error: tasksError } =
     latestEventIds.length > 0
-      ? await supabase.from("hearing_tasks").select("*").in("event_id", latestEventIds).eq("is_done", false)
-      : { data: [] as HearingTask[], error: null };
+      ? await supabase.from("tasks").select("*").in("event_id", latestEventIds).eq("is_done", false)
+      : { data: [] as Task[], error: null };
   if (tasksError) throw tasksError;
 
-  const tasksByEvent = groupBy<HearingTask>(tasks ?? [], (t) => t.event_id);
+  const tasksByEvent = groupBy<Task>(tasks ?? [], (t) => t.event_id as string);
 
   return cases.map((c) => {
     const latestEvent = latestEventByCase.get(c.id) ?? null;

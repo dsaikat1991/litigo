@@ -85,12 +85,12 @@ export async function recordHearing(formData: FormData) {
 
   await Promise.all([
     tasks.length > 0
-      ? supabase.from("hearing_tasks").insert(
-          tasks.map((description) => ({
+      ? supabase.from("tasks").insert(
+          tasks.map((title) => ({
             case_id: caseId,
             event_id: event.id,
             owner_id: user.id,
-            description,
+            title,
           })),
         )
       : Promise.resolve(),
@@ -154,6 +154,27 @@ async function scheduleHearingReminders({
 
   if (!nextHearingDate) return;
 
+  const { data: prefs } = await supabase
+    .from("profiles")
+    .select(
+      "notify_7_day_in_app, notify_7_day_email, notify_3_day_in_app, notify_3_day_email, notify_1_day_in_app, notify_1_day_email, notify_same_day_in_app, notify_same_day_email",
+    )
+    .eq("id", ownerId)
+    .maybeSingle();
+
+  // Column names follow "notify_{timing}_{channel}" — this maps a timing to
+  // its two column names, one per channel, so enabled-channel lookup below
+  // doesn't need a big switch. Defaults to enabled if prefs are somehow
+  // missing, matching the columns' own `not null default true`.
+  const columnFor: Record<NotificationTiming, Record<NotificationChannel, keyof NonNullable<typeof prefs>>> = {
+    "7_day": { in_app: "notify_7_day_in_app", email: "notify_7_day_email" },
+    "3_day": { in_app: "notify_3_day_in_app", email: "notify_3_day_email" },
+    "1_day": { in_app: "notify_1_day_in_app", email: "notify_1_day_email" },
+    same_day: { in_app: "notify_same_day_in_app", email: "notify_same_day_email" },
+  };
+  const isEnabled = (timing: NotificationTiming, channel: NotificationChannel) =>
+    prefs ? prefs[columnFor[timing][channel]] : true;
+
   // India-first app; reminders are date-only (no time-of-day component), so
   // Asia/Kolkata is a reasonable fixed default here rather than threading a
   // per-user timezone through a server action just for this comparison.
@@ -162,7 +183,7 @@ async function scheduleHearingReminders({
   const rows = REMINDER_OFFSETS.flatMap(({ timing, days }) => {
     const remindAt = addDaysToKey(nextHearingDate, days);
     if (remindAt < todayKey) return [];
-    return NOTIFICATION_CHANNELS.map((channel) => ({
+    return NOTIFICATION_CHANNELS.filter((channel) => isEnabled(timing, channel)).map((channel) => ({
       case_id: caseId,
       event_id: eventId,
       owner_id: ownerId,
@@ -176,28 +197,6 @@ async function scheduleHearingReminders({
   if (rows.length > 0) {
     await supabase.from("notification_schedules").insert(rows);
   }
-}
-
-export async function toggleHearingTask(formData: FormData) {
-  const id = String(formData.get("id") ?? "");
-  const caseId = String(formData.get("case_id") ?? "");
-  const isDone = String(formData.get("is_done") ?? "") === "true";
-  if (!id || !caseId) return;
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  await supabase
-    .from("hearing_tasks")
-    .update({ is_done: isDone, completed_at: isDone ? new Date().toISOString() : null })
-    .eq("id", id);
-
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/diary");
-  revalidatePath(`/dashboard/cases/${caseId}`);
 }
 
 export async function markNotificationRead(formData: FormData) {
