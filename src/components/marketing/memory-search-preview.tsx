@@ -142,7 +142,7 @@ function StatusBadge({ status }: { status: TimelineEntry["status"] }) {
   );
 }
 
-export function MemorySearchPreview() {
+export function MemorySearchPreview({ compact = false }: { compact?: boolean } = {}) {
   // Server-rendered (and reduced-motion) state is the finished, fully
   // populated card — the same "already complete" pattern used for the
   // hero's own underline treatment. Motion users get a single type-in
@@ -181,11 +181,21 @@ export function MemorySearchPreview() {
   }, []);
 
   return (
-    <div className="relative flex items-center justify-center py-6">
-      <div className="bg-card border-border relative w-full max-w-4xl overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgba(0,0,0,0.04),0_24px_56px_-16px_rgba(0,0,0,0.18)]">
-        <div className="grid grid-cols-1 lg:grid-cols-2">
-          {/* Left: search + timeline results */}
-          <div className="border-border flex flex-col p-5 lg:border-r">
+    <div className={compact ? "relative flex items-center justify-center" : "relative flex items-center justify-center py-6"}>
+      <div
+        className={
+          compact
+            ? "bg-card border-border relative w-full overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgba(0,0,0,0.04),0_24px_56px_-16px_rgba(0,0,0,0.18)]"
+            : "bg-card border-border relative w-full max-w-4xl overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgba(0,0,0,0.04),0_24px_56px_-16px_rgba(0,0,0,0.18)]"
+        }
+      >
+        <div className={compact ? undefined : "grid grid-cols-1 lg:grid-cols-2"}>
+          {/* Left: search + timeline results. In compact mode this is the
+              only panel — the detail/tabs panel is dropped entirely rather
+              than squeezed into a narrower column, since this mode is used
+              side-by-side with unrelated content (the "Built for
+              Litigators" feature list), not as a standalone two-panel demo. */}
+          <div className={compact ? "flex flex-col p-5" : "border-border flex flex-col p-5 lg:border-r"}>
             <div className="bg-muted/60 flex items-center gap-2.5 rounded-lg border px-4 py-3">
               <Search className="text-muted-foreground size-[17px] shrink-0" />
               <span className="flex-1 text-[15px]">
@@ -282,67 +292,70 @@ export function MemorySearchPreview() {
           {/* Right: detail panel for whichever entry is selected on the left —
               purely decorative (tabs beyond Overview are shown, not wired),
               matching how the rest of the app ships inert UI honestly rather
-              than faking functionality that doesn't exist yet. */}
-          <div className="flex flex-col gap-4 p-5">
-            <div>
-              <h3 className="text-base font-semibold tracking-tight">{selected.title}</h3>
-              <p className="text-muted-foreground mt-0.5 flex flex-wrap items-center gap-1.5 text-xs">
-                {selected.caseNo} • {selected.court}
-                <StatusBadge status={selected.status} />
-              </p>
-            </div>
+              than faking functionality that doesn't exist yet. Dropped
+              entirely in compact mode (see note above the left panel). */}
+          {!compact && (
+            <div className="flex flex-col gap-4 p-5">
+              <div>
+                <h3 className="text-base font-semibold tracking-tight">{selected.title}</h3>
+                <p className="text-muted-foreground mt-0.5 flex flex-wrap items-center gap-1.5 text-xs">
+                  {selected.caseNo} • {selected.court}
+                  <StatusBadge status={selected.status} />
+                </p>
+              </div>
 
-            <div className="border-border flex flex-wrap gap-3 border-b pb-2.5 text-xs">
-              {TABS.map((tab, i) => {
-                const Icon = tab.icon;
-                return (
-                  <span
-                    key={tab.key}
-                    className={
-                      i === 0
-                        ? "text-verified border-verified -mb-[11px] flex items-center gap-1 border-b-2 pb-2.5 font-medium"
-                        : "text-muted-foreground/60 flex items-center gap-1"
-                    }
-                  >
-                    <Icon className="size-3.5" />
-                    {tab.label}
-                  </span>
-                );
-              })}
-            </div>
-
-            <p className="bg-muted/40 rounded-lg p-3 text-[13px] leading-relaxed">
-              {selected.overview}
-            </p>
-
-            <div className="flex flex-col gap-2.5">
-              {selected.fields.map((field) => {
-                const Icon = field.icon;
-                return (
-                  <div
-                    key={field.label}
-                    className="border-border/60 flex items-center justify-between gap-3 border-b pb-2.5 text-xs last:border-b-0"
-                  >
-                    <span className="text-muted-foreground flex items-center gap-1.5">
-                      <Icon className="size-3.5 shrink-0" />
-                      {field.label}
+              <div className="border-border flex flex-wrap gap-3 border-b pb-2.5 text-xs">
+                {TABS.map((tab, i) => {
+                  const Icon = tab.icon;
+                  return (
+                    <span
+                      key={tab.key}
+                      className={
+                        i === 0
+                          ? "text-verified border-verified -mb-[11px] flex items-center gap-1 border-b-2 pb-2.5 font-medium"
+                          : "text-muted-foreground/60 flex items-center gap-1"
+                      }
+                    >
+                      <Icon className="size-3.5" />
+                      {tab.label}
                     </span>
-                    <span className="text-right font-medium">{field.value}</span>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
 
-            <div className="mt-auto flex gap-2 pt-1">
-              <span className="border-border flex-1 rounded-lg border px-3 py-2 text-center text-xs font-medium">
-                View details
-              </span>
-              <span className="bg-verified text-background flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium">
-                Open case
-                <ArrowRight className="size-3.5" />
-              </span>
+              <p className="bg-muted/40 rounded-lg p-3 text-[13px] leading-relaxed">
+                {selected.overview}
+              </p>
+
+              <div className="flex flex-col gap-2.5">
+                {selected.fields.map((field) => {
+                  const Icon = field.icon;
+                  return (
+                    <div
+                      key={field.label}
+                      className="border-border/60 flex items-center justify-between gap-3 border-b pb-2.5 text-xs last:border-b-0"
+                    >
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <Icon className="size-3.5 shrink-0" />
+                        {field.label}
+                      </span>
+                      <span className="text-right font-medium">{field.value}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-auto flex gap-2 pt-1">
+                <span className="border-border flex-1 rounded-lg border px-3 py-2 text-center text-xs font-medium">
+                  View details
+                </span>
+                <span className="bg-verified text-background flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium">
+                  Open case
+                  <ArrowRight className="size-3.5" />
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

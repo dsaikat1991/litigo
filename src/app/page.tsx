@@ -2,12 +2,6 @@ import Link from "next/link";
 import { ArrowLeft, EyeOff, Lock, Play, PenLine, Zap } from "lucide-react";
 import { DashboardPreview } from "@/components/marketing/dashboard-preview";
 import { MemorySearchPreview } from "@/components/marketing/memory-search-preview";
-import {
-  SearchDepthIcon,
-  CompoundGrowthIcon,
-  OwnershipIcon,
-  SpeedIcon,
-} from "@/components/marketing/capture-build-find";
 import { SiteHeader } from "@/components/marketing/site-header";
 
 // `href: null` marks a page that doesn't exist yet — rendered as plain
@@ -93,25 +87,29 @@ const STEPS = [
   },
 ] as const;
 
+// Used twice: as plain text next to the "Built for Litigators" search demo,
+// and further down in its own icon grid ("Why Litigo") — kept side by side
+// deliberately for now while the two sections get fine-tuned; `icon` is
+// only read by the icon-grid rendering.
 const WHY_POINTS = [
   {
-    Icon: SearchDepthIcon,
+    icon: "/icons/why_search.svg",
     title: "Search beyond file names",
     description:
       "Find cases by arguments, legal issues, parties, judgments or your own notes.",
   },
   {
-    Icon: CompoundGrowthIcon,
+    icon: "/icons/why_ec.svg",
     title: "Experience compounds",
     description: "Turn every matter into knowledge you can reuse in the next one.",
   },
   {
-    Icon: OwnershipIcon,
+    icon: "/icons/why_own_work.svg",
     title: "You own your work",
     description: "Your legal knowledge remains yours, always.",
   },
   {
-    Icon: SpeedIcon,
+    icon: "/icons/why_speed.svg",
     title: "Designed for speed",
     description: "Find what matters in seconds and stay focused on your practice.",
   },
@@ -219,10 +217,41 @@ export default function Home() {
           </div>
         </div>
 
+        {/* "Built for Litigators" — a compact version of the same search
+            demo shown again (full two-panel) in "Find what you've already
+            learned" below, sitting beside the same four points shown again
+            as plain text here. Deliberately duplicated content for now —
+            both sections are still being fine-tuned, not a final decision. */}
         <div>
-          {/* Heading-left, description-right — a two-column split instead
-              of a stacked block, deliberately not a repeat of the previous
-              section's treatment. No text highlighting here. */}
+          <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-3 px-4 pt-20 pb-10 text-center sm:px-8 sm:pt-28">
+            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+              Built for Litigators
+            </h2>
+            <p className="font-manrope text-muted-foreground max-w-xl text-lg leading-relaxed text-balance">
+              Purpose-built for advocates who believe every case should make the next one
+              stronger.
+            </p>
+          </div>
+
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-4 pb-24 sm:grid-cols-2 sm:items-start sm:px-8 sm:pb-32">
+            <MemorySearchPreview compact />
+            <div className="flex flex-col gap-8 sm:border-l sm:border-border sm:pl-10">
+              {WHY_POINTS.map((point) => (
+                <div key={point.title} className="flex flex-col gap-1.5 text-left">
+                  <h3 className="text-base font-semibold tracking-tight">{point.title}</h3>
+                  <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
+                    {point.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Heading-left, description-right — a two-column split instead
+            of a stacked block, deliberately not a repeat of the previous
+            section's treatment. No text highlighting here. */}
+        <div className="border-t">
           <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 px-4 pt-20 pb-10 text-left sm:grid-cols-2 sm:items-center sm:px-8 sm:pt-28">
             <h2 className="text-left text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
               Find what you&apos;ve
@@ -237,30 +266,6 @@ export default function Home() {
 
           <div className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-8 sm:pb-32">
             <MemorySearchPreview />
-          </div>
-        </div>
-
-        {/* A 2x2 benefits grid using the same isometric-illustration family
-            as the Capture/Build/Find section above, so the two illustrated
-            sections read as one visual language rather than the icon set
-            switching languages partway down the page. */}
-        <div className="border-t">
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 text-left sm:px-8 sm:py-24">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Why Litigo</h2>
-            <div className="grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2">
-              {WHY_POINTS.map((point) => {
-                const Icon = point.Icon;
-                return (
-                  <div key={point.title} className="flex flex-col items-start gap-3 text-left">
-                    <Icon className="text-foreground/80 h-24 w-auto" />
-                    <h3 className="text-base font-semibold tracking-tight">{point.title}</h3>
-                    <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
-                      {point.description}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
 
@@ -355,9 +360,9 @@ export default function Home() {
               size, but the wrapper is shorter and clips (overflow-hidden)
               so the cube's bottom simply doesn't render past the footer
               divider — no gradient, no fade. */}
-          <div className="mx-auto w-full max-w-5xl overflow-hidden px-4 sm:px-8" style={{ aspectRatio: "1228 / 400" }}>
+          <div className="mx-auto w-full max-w-5xl overflow-hidden px-4 sm:px-8" style={{ aspectRatio: "1218 / 419" }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, no benefit from next/image's optimization pipeline */}
-            <img src="/icons/bottomCTA.svg" alt="" aria-hidden="true" className="w-full" style={{ aspectRatio: "1228 / 549" }} />
+            <img src="/icons/bottomCTA.svg" alt="" aria-hidden="true" className="w-full" style={{ aspectRatio: "1218 / 575" }} />
           </div>
         </div>
       </main>
