@@ -124,6 +124,18 @@ file_size_limit = "50MiB"
 # allowed_mime_types = ["image/png", "image/jpeg"]
 # objects_path = "./images"
 
+[storage.buckets.documents]
+public = false
+file_size_limit = "20MiB"
+allowed_mime_types = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/png",
+  "image/jpeg",
+  "text/plain",
+]
+
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]
 enabled = true
