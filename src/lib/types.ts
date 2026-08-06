@@ -186,3 +186,38 @@ export interface PracticeArea {
   name: string;
   created_at: string;
 }
+
+export type BlogPostStatus = "draft" | "published";
+
+export interface BlogPost {
+  id: string;
+  author_id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  cover_image_url: string | null;
+  status: BlogPostStatus;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  author?: { full_name: string | null; avatar_url: string | null } | null;
+}
+
+export type SubscriptionPlan = "basic_monthly" | "basic_annual" | "pro_monthly" | "pro_annual";
+export type SubscriptionStatus =
+  | "created"
+  | "pending"
+  | "active"
+  | "halted"
+  | "cancelled"
+  | "completed"
+  | "expired";
+
+export interface Subscription {
+  plan: SubscriptionPlan;
+  status: SubscriptionStatus;
+  cancelAtPeriodEnd: boolean;
+  currentPeriodEnd: string | null;
+  razorpaySubscriptionId: string;
+}

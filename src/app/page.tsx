@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { ArrowLeft, EyeOff, Lock, Play, PenLine, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Play, Zap } from "lucide-react";
 import { DashboardPreview } from "@/components/marketing/dashboard-preview";
+import { InsideCasePreview } from "@/components/marketing/inside-case-preview";
 import { MemorySearchPreview } from "@/components/marketing/memory-search-preview";
 import { SiteHeader } from "@/components/marketing/site-header";
+import { getPublishedBlogPosts } from "@/lib/data/blog";
 
 // `href: null` marks a page that doesn't exist yet — rendered as plain
 // text rather than a link so the footer never points somewhere that 404s.
@@ -12,7 +14,7 @@ const FOOTER_COLUMNS = [
     title: "Product",
     links: [
       { href: null, label: "Features" },
-      { href: null, label: "Pricing" },
+      { href: "/pricing", label: "Pricing" },
       { href: null, label: "Security" },
       { href: null, label: "Changelog" },
     ],
@@ -29,7 +31,7 @@ const FOOTER_COLUMNS = [
   {
     title: "Resources",
     links: [
-      { href: null, label: "Blog" },
+      { href: "/blog", label: "Blog" },
       { href: null, label: "Documentation" },
       { href: null, label: "Help Centre" },
       { href: null, label: "Product Updates" },
@@ -65,21 +67,21 @@ const SOCIAL_LINKS = [
 // compensation needed.
 const STEPS = [
   {
-    number: "01",
+    number: "01 - Capture",
     icon: "/icons/capture_legal_knowledge.svg",
     title: "Capture what matters.",
     description:
       "Log the argument, the research, the outcome — in the moment, not reconstructed from memory months later.",
   },
   {
-    number: "02",
+    number: "02 - Build",
     icon: "/icons/litigation_memory.svg",
     title: "Build your litigation memory.",
     description:
       "Everything you capture becomes part of one growing record, linked to the matter it came from.",
   },
   {
-    number: "03",
+    number: "03 - Find",
     icon: "/icons/search.svg",
     title: "Find it when it matters most.",
     description:
@@ -87,56 +89,22 @@ const STEPS = [
   },
 ] as const;
 
-// Used twice: as plain text next to the "Built for Litigators" search demo,
-// and further down in its own icon grid ("Why Litigo") — kept side by side
-// deliberately for now while the two sections get fine-tuned; `icon` is
-// only read by the icon-grid rendering.
-const WHY_POINTS = [
-  {
-    icon: "/icons/why_search.svg",
-    title: "Search beyond file names",
-    description:
-      "Find cases by arguments, legal issues, parties, judgments or your own notes.",
-  },
-  {
-    icon: "/icons/why_ec.svg",
-    title: "Experience compounds",
-    description: "Turn every matter into knowledge you can reuse in the next one.",
-  },
-  {
-    icon: "/icons/why_own_work.svg",
-    title: "You own your work",
-    description: "Your legal knowledge remains yours, always.",
-  },
-  {
-    icon: "/icons/why_speed.svg",
-    title: "Designed for speed",
-    description: "Find what matters in seconds and stay focused on your practice.",
-  },
-] as const;
+export default async function Home() {
+  // The one real-data-driven marketing section on this page — every other
+  // marketing component (DashboardPreview, MemorySearchPreview,
+  // InsideCasePreview) is hardcoded decorative mock data. Fetched here
+  // rather than in a leaf component so the section can simply not render
+  // at all when there are zero published posts yet. Caught rather than
+  // left to throw (unlike this codebase's usual data-layer convention)
+  // specifically because this is the public homepage: the migration this
+  // depends on is applied manually and separately from code deploys, so
+  // there's a real window where the table doesn't exist yet — that must
+  // never take the whole marketing site down.
+  const blogPosts = await getPublishedBlogPosts(6).catch(() => []);
+  // Cover images are the whole section — a post with none has nothing to
+  // show here, so it's skipped rather than falling back to a text card.
+  const blogPostsWithCovers = blogPosts.filter((post) => post.cover_image_url).slice(0, 3);
 
-const TRUST_POINTS = [
-  {
-    Icon: Lock,
-    title: "Isolated at the database level",
-    description:
-      "Row-level security scopes every account's cases, arguments, and memories to that account alone — enforced by the database itself, not just filtered in the app.",
-  },
-  {
-    Icon: EyeOff,
-    title: "Never shared. Never sold.",
-    description:
-      "What you write down stays yours. Nothing is shared across accounts, and nothing is used to train any AI model.",
-  },
-  {
-    Icon: PenLine,
-    title: "You decide what's captured",
-    description:
-      "Nothing is logged automatically. Every entry — a case, an argument, a memory — is something you chose to write down.",
-  },
-] as const;
-
-export default function Home() {
   return (
     <div className="flex flex-1 flex-col">
       <SiteHeader />
@@ -173,14 +141,14 @@ export default function Home() {
           <DashboardPreview />
         </div>
 
-        <div className="mt-2 border-b">
+        <div className="mt-[58px] border-b">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 pt-6 pb-14 px-4 text-left sm:px-8 sm:pt-8 sm:pb-20">
             <h2 className="max-w-5xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
               Your legal experience compounds with every case.
             </h2>
             <p className="font-manrope text-muted-foreground max-w-2xl text-lg leading-relaxed text-balance">
-              Every case, every argument, every research note and every lesson becomes part of a
-              legal memory that grows with your practice—instantly searchable years later.
+              Every matter leaves behind valuable experience. Too often, it&apos;s buried in
+              diaries, folders or memory. Litigo gives it a permanent, searchable home.
             </p>
           </div>
 
@@ -217,41 +185,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* "Built for Litigators" — a compact version of the same search
-            demo shown again (full two-panel) in "Find what you've already
-            learned" below, sitting beside the same four points shown again
-            as plain text here. Deliberately duplicated content for now —
-            both sections are still being fine-tuned, not a final decision. */}
-        <div>
-          <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-3 px-4 pt-20 pb-10 text-center sm:px-8 sm:pt-28">
-            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Built for Litigators
-            </h2>
-            <p className="font-manrope text-muted-foreground max-w-xl text-lg leading-relaxed text-balance">
-              Purpose-built for advocates who believe every case should make the next one
-              stronger.
-            </p>
-          </div>
-
-          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-4 pb-24 sm:grid-cols-2 sm:items-start sm:px-8 sm:pb-32">
-            <MemorySearchPreview compact />
-            <div className="flex flex-col gap-8 sm:border-l sm:border-border sm:pl-10">
-              {WHY_POINTS.map((point) => (
-                <div key={point.title} className="flex flex-col gap-1.5 text-left">
-                  <h3 className="text-base font-semibold tracking-tight">{point.title}</h3>
-                  <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
-                    {point.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Heading-left, description-right — a two-column split instead
             of a stacked block, deliberately not a repeat of the previous
-            section's treatment. No text highlighting here. */}
-        <div className="border-t">
+            section's treatment. No text highlighting here. The section
+            above already closes with its own border-b, so this one skips
+            border-t rather than stacking a second divider right beneath
+            it. */}
+        <div>
           <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 px-4 pt-20 pb-10 text-left sm:grid-cols-2 sm:items-center sm:px-8 sm:pt-28">
             <h2 className="text-left text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
               Find what you&apos;ve
@@ -264,47 +204,99 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-8 sm:pb-32">
+          <div className="mx-auto w-full max-w-[99rem] px-2 pb-24 sm:px-4 sm:pb-32">
             <MemorySearchPreview />
           </div>
         </div>
 
-        {/* Deliberately plain and direct — no icons-with-colored-badges, no
-            editorial illustration, no interactive demo. A trust section
-            about confidentiality reads as more credible when it looks
-            serious rather than "on-brand playful", which is why this one
-            breaks from every visual treatment used above it. */}
-        <div className="border-t">
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 text-left sm:px-8 sm:py-24">
-            <div className="flex max-w-2xl flex-col gap-3">
-              <span className="text-muted-foreground text-[11px] font-medium tracking-[0.14em] uppercase">
-                Privacy, by design
-              </span>
-              <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-                Client confidentiality doesn&apos;t stop at your case files.
-              </h2>
-              <p className="font-manrope text-muted-foreground max-w-xl text-lg leading-relaxed text-balance">
-                Litigo is built for a profession where confidentiality isn&apos;t optional —
-                the same discipline applies to how your own data is handled.
-              </p>
-            </div>
+        {/* -mb-14/-mb-20 exactly cancels the gap-14/sm:gap-20 the parent
+            <main> flex puts between every section — without it, the
+            crop below would still leave a visible gap of plain
+            background before the closing CTA's own border-t, breaking
+            the "touches the divider" effect. */}
+        <div className="-mb-14 overflow-hidden border-t sm:-mb-20">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-3 px-4 pt-20 pb-10 text-left sm:px-8 sm:pt-28">
+            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+              Built for Litigators
+            </h2>
+            <p className="font-manrope text-muted-foreground max-w-xl text-lg leading-relaxed text-balance">
+              Purpose-built for advocates who believe every case should make the next one
+              stronger.
+            </p>
+          </div>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              {TRUST_POINTS.map((point) => {
-                const Icon = point.Icon;
-                return (
-                  <div key={point.title} className="flex flex-col gap-3 rounded-lg border p-4">
-                    <Icon className="text-muted-foreground size-5" />
-                    <h3 className="text-sm font-semibold tracking-tight">{point.title}</h3>
-                    <p className="font-manrope text-muted-foreground text-sm leading-relaxed">
-                      {point.description}
-                    </p>
-                  </div>
-                );
-              })}
+          {/* Deliberately crops mid-content this time (partway through the
+              second timeline card's task list), as a "there's more below"
+              teaser rather than showing the whole card stack — the exact
+              opposite goal from this margin's earlier iterations, which
+              were tuned to show every card in full. -462px was measured
+              directly against the rendered assembly (bezelTop to the task
+              row's bottom, at this component's current copy) rather than
+              guessed as a percentage, since a width-relative value drifts
+              out of sync with the actual (viewport-independent) content
+              height. If the timeline copy above changes, re-measure this
+              rather than assuming the px value still lands in the same
+              place. Same max-w-[99rem]/px-2/sm:px-4 as the hero's
+              DashboardPreview and the search box above, so the laptop
+              renders exactly as wide as both. */}
+          <div className="mx-auto w-full max-w-[99rem] px-2 pt-4 sm:px-4">
+            <div style={{ marginBottom: "-462px" }}>
+              <InsideCasePreview />
             </div>
           </div>
         </div>
+
+        {/* Shows however many cover-imaged posts exist (up to 3), rather
+            than requiring exactly 3 — gating on an exact count means the
+            section would unpredictably vanish any time the post count
+            didn't line up, which is worse than a slightly uneven row.
+            Hidden only when there's truly nothing to show. */}
+        {blogPostsWithCovers.length > 0 && (
+          <div className="border-t">
+            <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-3 px-4 pt-20 pb-10 text-left sm:px-8 sm:pt-28">
+              <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                From the blog
+              </h2>
+              <p className="font-manrope text-muted-foreground max-w-xl text-lg leading-relaxed text-balance">
+                Insights on litigation, legal knowledge, and building a practice that grows with
+                every case.
+              </p>
+            </div>
+
+            {/* Same max-w-[99rem]/px-2/sm:px-4 as the "Built for Litigators"
+                laptop above, so these images line up with it edge to edge. */}
+            <div className="mx-auto w-full max-w-[99rem] px-2 pb-8 sm:px-4">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                {blogPostsWithCovers.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/blog/${post.slug}`}
+                    className="border-border block aspect-[4/3] overflow-hidden rounded-3xl border"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- admin-supplied Supabase Storage public URL, no benefit from next/image's optimization pipeline */}
+                    <img
+                      src={post.cover_image_url!}
+                      alt={post.title}
+                      className="size-full object-cover"
+                    />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="mx-auto w-full max-w-[99rem] px-2 pb-20 sm:px-4 sm:pb-28">
+              <div className="flex justify-end">
+                <Link
+                  href="/blog"
+                  className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm font-medium"
+                >
+                  View all
+                  <ArrowRight className="size-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Closing CTA — the page had no final call-to-action before this;
             it just ended after the last content section. Kept strictly
@@ -341,11 +333,11 @@ export default function Home() {
               <div className="text-muted-foreground absolute top-1/2 left-full ml-4 hidden -translate-y-1/2 items-center gap-2 sm:flex">
                 <ArrowLeft className="size-4 shrink-0" />
                 <p className="-rotate-2 text-left text-xs leading-snug whitespace-nowrap italic">
+                  Free forever plan.
+                  <br />
                   No credit card.
                   <br />
-                  No migration.
-                  <br />
-                  No new habit to learn.
+                  Start with just one case.
                 </p>
               </div>
             </div>

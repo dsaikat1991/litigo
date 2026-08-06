@@ -32,10 +32,14 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/signup") ||
     request.nextUrl.pathname.startsWith("/forgot-password");
-  const publicMarketingRoutes = ["/", "/about", "/how-it-works", "/terms", "/privacy", "/contact"];
+  const publicMarketingRoutes = ["/", "/about", "/how-it-works", "/terms", "/privacy", "/contact", "/pricing"];
   const isPublicRoute = publicMarketingRoutes.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/auth/callback") ||
-    request.nextUrl.pathname.startsWith("/reset-password");
+    request.nextUrl.pathname.startsWith("/reset-password") ||
+    // /blog and /blog/[slug] — the whole point of a public blog is being
+    // crawlable and readable by anonymous visitors, so this needs a
+    // prefix match (like /auth/callback above), not an exact one.
+    request.nextUrl.pathname.startsWith("/blog");
 
   if (!user && !isAuthRoute && !isPublicRoute) {
     const url = request.nextUrl.clone();
