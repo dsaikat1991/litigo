@@ -40,7 +40,7 @@ export default async function DashboardLayout({
         </div>
       </header>
       <div className="flex flex-1">
-        <Sidebar />
+        <Sidebar isAdmin={profile.isAdmin} />
         <main className="w-full flex-1 px-4 py-8 sm:px-8">
           <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>

@@ -7,6 +7,7 @@ export interface CurrentProfile {
   fullName: string | null;
   locale: string;
   timezone: string;
+  isAdmin: boolean;
 }
 
 export async function getCurrentProfile(): Promise<CurrentProfile | null> {
@@ -18,7 +19,7 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, locale, timezone")
+    .select("full_name, locale, timezone, is_admin")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -28,6 +29,7 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
     fullName: profile?.full_name ?? null,
     locale: profile?.locale ?? "en-IN",
     timezone: profile?.timezone ?? "Asia/Kolkata",
+    isAdmin: profile?.is_admin ?? false,
   };
 }
 
