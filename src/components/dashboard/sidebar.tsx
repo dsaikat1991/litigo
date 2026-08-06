@@ -2,16 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Folder, CalendarDays, Sparkles, UserRound, Settings, Newspaper } from "lucide-react";
+import {
+  Home,
+  Search,
+  Folder,
+  CalendarDays,
+  Sparkles,
+  UserRound,
+  Settings,
+  CreditCard,
+  Newspaper,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Home", icon: Home, exact: true },
+  { href: "/dashboard/search", label: "Search", icon: Search, exact: false },
   { href: "/dashboard/cases", label: "Cases", icon: Folder, exact: false },
   { href: "/dashboard/diary", label: "Court Diary", icon: CalendarDays, exact: false },
   { href: "/dashboard/memories", label: "Memories", icon: Sparkles, exact: false },
   { href: "/dashboard/profile", label: "Profile", icon: UserRound, exact: false },
   { href: "/dashboard/settings", label: "Settings", icon: Settings, exact: false },
+  { href: "/dashboard/billing", label: "Billing", icon: CreditCard, exact: false },
 ];
 
 const ADMIN_NAV_ITEM = {

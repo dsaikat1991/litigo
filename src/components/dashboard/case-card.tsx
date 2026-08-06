@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, CalendarDays, Milestone, MessagesSquare, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, FileText, Milestone, MessagesSquare, Sparkles } from "lucide-react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CaseCardMenu } from "@/components/dashboard/case-card-menu";
 import { CaseCardExtraStats } from "@/components/dashboard/case-card-extra-stats";
-import { caseStatusBadgeVariant, formatDate } from "@/lib/utils";
+import { cn, caseStatusBadgeVariant, formatDate, highlightMatch } from "@/lib/utils";
 import type { Case } from "@/lib/types";
 
 function pluralize(count: number, singular: string, plural: string = `${singular}s`): string {
@@ -34,10 +34,16 @@ export function CaseCard({
   caseItem,
   locale,
   timeZone,
+  bare = false,
+  query,
+  showDocumentCount = false,
 }: {
-  caseItem: Case;
+  caseItem: Case & { matchedField?: string; matchedSnippet?: string };
   locale: string;
   timeZone: string;
+  bare?: boolean;
+  query?: string;
+  showDocumentCount?: boolean;
 }) {
   const dateField =
     caseItem.status === "archived" && caseItem.decided_on
@@ -50,7 +56,15 @@ export function CaseCard({
   const href = `/dashboard/cases/${caseItem.id}`;
 
   return (
-    <Card className="h-full rounded-none border-x border-y-0 border-border ring-0">
+    <Card
+      className={cn(
+        "h-full rounded-none ring-0",
+        // bare: no border utility at all — an explicit border-0 here would
+        // win over the parent's divide-y border-top (both target the same
+        // property on this element), silently cancelling the separator.
+        !bare && "border-x border-y-0 border-border",
+      )}
+    >
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
           {caseItem.case_number ? (
@@ -105,7 +119,12 @@ export function CaseCard({
           <Stat icon={MessagesSquare} count={caseItem.argument_count ?? 0} label="argument" />
           <Stat icon={BookOpen} count={caseItem.research_count ?? 0} label="research note" />
           <Stat icon={Sparkles} count={caseItem.memory_count ?? 0} label="memory" plural="memories" />
-          <CaseCardExtraStats caseItem={caseItem} />
+          {showDocumentCount && (
+            <Stat icon={FileText} count={caseItem.document_count ?? 0} label="document" />
+          )}
+          {/* Popover's own document count would be redundant once it's already
+              shown inline above — same showDocumentCount flag hides it. */}
+          {!showDocumentCount && <CaseCardExtraStats caseItem={caseItem} />}
         </div>
         {caseItem.tags.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
@@ -130,6 +149,12 @@ export function CaseCard({
             <ArrowRight className="size-3.5" />
           </Link>
         </div>
+        {caseItem.matchedField && (
+          <p className="text-muted-foreground text-xs">
+            Matched: <span className="font-medium">{caseItem.matchedField}</span> —{" "}
+            {query ? highlightMatch(caseItem.matchedSnippet ?? "", query) : caseItem.matchedSnippet}
+          </p>
+        )}
       </CardContent>
     </Card>
   );

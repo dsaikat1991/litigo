@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { previewText } from "@/lib/utils";
 
 export interface SearchSuggestion {
-  type: "case" | "memory";
+  type: "case" | "memory" | "argument" | "research" | "document";
   id: string;
   caseId?: string;
   label: string;
@@ -30,11 +30,13 @@ function findMatch(candidates: FieldCandidate[], query: string): FieldCandidate 
 
 export type SearchScope = "all" | "cases" | "memories";
 
-// Deliberately shallow and fast — matches only a record's own fields (case
-// title/number/court/etc, memory content/tags), not the cross-table "matched
-// via an argument note" logic the full dashboard search does. That
-// exhaustive version stays reserved for hitting Enter; this one just needs
-// to be quick enough to run on every keystroke.
+// Deliberately shallow and fast — matches only a record's own fields, not
+// the cross-table "matched via an argument note" logic the full dashboard
+// search does. That exhaustive version stays reserved for hitting Enter;
+// this one just needs to be quick enough to run on every keystroke.
+// Arguments/research/documents are only queried for the "all" scope — the
+// "cases"/"memories" scopes back the search bars on their own dedicated
+// list pages, which should stay narrow to that one type.
 export async function getSearchSuggestions(
   query: string,
   scope: SearchScope = "all",
@@ -44,8 +46,9 @@ export async function getSearchSuggestions(
 
   const supabase = await createClient();
   const pattern = `%${trimmed}%`;
+  const includeOtherTypes = scope === "all";
 
-  const [caseMatches, memoryMatches] = await Promise.all([
+  const [caseMatches, memoryMatches, argumentMatches, researchMatches, documentMatches] = await Promise.all([
     scope === "memories"
       ? Promise.resolve({ data: [], error: null })
       : supabase
@@ -62,9 +65,36 @@ export async function getSearchSuggestions(
           .ilike("search_text", pattern)
           .order("created_at", { ascending: false })
           .limit(5),
+    includeOtherTypes
+      ? supabase
+          .from("argument_notes")
+          .select("id, issue, content, tags, case_id")
+          .ilike("search_text", pattern)
+          .order("created_at", { ascending: false })
+          .limit(5)
+      : Promise.resolve({ data: [], error: null }),
+    includeOtherTypes
+      ? supabase
+          .from("research_notes")
+          .select("id, citation, content, tags, case_id")
+          .ilike("search_text", pattern)
+          .order("created_at", { ascending: false })
+          .limit(5)
+      : Promise.resolve({ data: [], error: null }),
+    includeOtherTypes
+      ? supabase
+          .from("documents")
+          .select("id, file_name, case_id")
+          .ilike("search_text", pattern)
+          .order("created_at", { ascending: false })
+          .limit(5)
+      : Promise.resolve({ data: [], error: null }),
   ]);
   if (caseMatches.error) throw caseMatches.error;
   if (memoryMatches.error) throw memoryMatches.error;
+  if (argumentMatches.error) throw argumentMatches.error;
+  if (researchMatches.error) throw researchMatches.error;
+  if (documentMatches.error) throw documentMatches.error;
 
   const caseResults: SearchSuggestion[] = (caseMatches.data ?? []).map((c) => {
     // Title checked first: if it matches, that's the meaningful explanation
@@ -106,5 +136,54 @@ export async function getSearchSuggestions(
     };
   });
 
-  return [...caseResults, ...memoryResults].slice(0, 5);
+  const argumentResults: SearchSuggestion[] = (argumentMatches.data ?? []).map((n) => {
+    const candidates: FieldCandidate[] = [
+      { field: "Issue", value: n.issue ?? "" },
+      { field: "Content", value: n.content ?? "" },
+      ...(n.tags ?? []).map((tag: string) => ({ field: "Tag", value: tag })),
+    ];
+    const match = findMatch(candidates, trimmed);
+    const isPrimaryMatch = !match || match.field === "Issue" || match.field === "Content";
+    return {
+      type: "argument" as const,
+      id: n.id,
+      caseId: n.case_id ?? undefined,
+      label: n.issue || previewText(n.content, 60),
+      matchedField: isPrimaryMatch ? undefined : match!.field,
+      matchedSnippet: isPrimaryMatch ? undefined : match!.value,
+    };
+  });
+
+  const researchResults: SearchSuggestion[] = (researchMatches.data ?? []).map((n) => {
+    const candidates: FieldCandidate[] = [
+      { field: "Citation", value: n.citation ?? "" },
+      { field: "Content", value: n.content ?? "" },
+      ...(n.tags ?? []).map((tag: string) => ({ field: "Tag", value: tag })),
+    ];
+    const match = findMatch(candidates, trimmed);
+    const isPrimaryMatch = !match || match.field === "Citation" || match.field === "Content";
+    return {
+      type: "research" as const,
+      id: n.id,
+      caseId: n.case_id ?? undefined,
+      label: n.citation || previewText(n.content, 60),
+      matchedField: isPrimaryMatch ? undefined : match!.field,
+      matchedSnippet: isPrimaryMatch ? undefined : match!.value,
+    };
+  });
+
+  // search_text on documents is just the filename (see the avatars/documents
+  // search_text migrations) — every hit is inherently a filename match, so
+  // there's no secondary field to explain, unlike the other four types.
+  const documentResults: SearchSuggestion[] = (documentMatches.data ?? []).map((d) => ({
+    type: "document" as const,
+    id: d.id,
+    caseId: d.case_id ?? undefined,
+    label: d.file_name,
+  }));
+
+  return [...caseResults, ...memoryResults, ...argumentResults, ...researchResults, ...documentResults].slice(
+    0,
+    5,
+  );
 }

@@ -27,6 +27,25 @@ export function previewText(content: string, maxLen = 50): string {
   return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + "…";
 }
 
+// Wraps the first case-insensitive occurrence of `query` inside `text` in a
+// highlighter-style <mark> — literally the marker-pen metaphor an advocate
+// already reaches for on a physical page.
+export function highlightMatch(text: string, query: string) {
+  const trimmed = query.trim();
+  if (!trimmed) return text;
+  const idx = text.toLowerCase().indexOf(trimmed.toLowerCase());
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="rounded-[2px] bg-yellow-200 px-0.5 text-inherit">
+        {text.slice(idx, idx + trimmed.length)}
+      </mark>
+      {text.slice(idx + trimmed.length)}
+    </>
+  );
+}
+
 // locale/timeZone are required, not defaulted — they must come from the
 // viewer's own profile (see getCurrentProfile), not an ambient runtime
 // default. A bare `undefined` here would resolve differently in a Server

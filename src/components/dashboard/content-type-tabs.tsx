@@ -3,13 +3,15 @@ import Link from "next/link";
 const LINKED_TABS = [
   { key: "cases", label: "Cases", href: "/dashboard/cases" },
   { key: "memories", label: "Memories", href: "/dashboard/memories" },
+  { key: "arguments", label: "Arguments", href: "/dashboard/search?type=argument" },
+  { key: "research", label: "Research", href: "/dashboard/search?type=research" },
+  { key: "documents", label: "Documents", href: "/dashboard/search?type=document" },
 ] as const;
 
-// Arguments/Research have no cross-case browsing view yet (notes only exist
-// scoped to a single case today); Documents/People need infrastructure that
-// doesn't exist yet (document storage, structured opposing-party data).
-// Shown for layout parity with the product vision, disabled rather than faked.
-const COMING_SOON_TABS = ["Arguments", "Research", "Documents", "People"] as const;
+// People needs infrastructure that doesn't exist yet (structured
+// opposing-party/contact data). Shown for layout parity with the product
+// vision, disabled rather than faked.
+const COMING_SOON_TABS = ["People"] as const;
 
 export function ContentTypeTabs() {
   return (

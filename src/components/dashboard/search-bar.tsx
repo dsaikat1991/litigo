@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addRecentSearch, getRecentSearches } from "@/lib/recent-searches";
+import { highlightMatch } from "@/lib/utils";
 import { getSearchSuggestions, type SearchScope, type SearchSuggestion } from "@/lib/actions/search";
 
 export const DEFAULT_EXAMPLE_QUERIES = [
@@ -12,25 +13,6 @@ export const DEFAULT_EXAMPLE_QUERIES = [
   "section 54 limitation",
   "specific performance",
 ];
-
-// Wraps the first case-insensitive occurrence of `query` inside `text` in a
-// highlighter-style <mark> — literally the marker-pen metaphor an advocate
-// already reaches for on a physical page.
-function highlightMatch(text: string, query: string) {
-  const trimmed = query.trim();
-  if (!trimmed) return text;
-  const idx = text.toLowerCase().indexOf(trimmed.toLowerCase());
-  if (idx === -1) return text;
-  return (
-    <>
-      {text.slice(0, idx)}
-      <mark className="rounded-[2px] bg-yellow-200 px-0.5 text-inherit">
-        {text.slice(idx, idx + trimmed.length)}
-      </mark>
-      {text.slice(idx + trimmed.length)}
-    </>
-  );
-}
 
 export function SearchBar({
   defaultValue,
@@ -91,6 +73,16 @@ export function SearchBar({
   function goToCase(id: string) {
     setOpen(false);
     router.push(`/dashboard/cases/${id}`);
+  }
+
+  // Cases have their own detail page to jump straight to; memories don't
+  // (falls through to a full search, unchanged). Arguments/research/
+  // documents don't have one either, but they do belong to a case, so
+  // jumping to that case is the closest useful destination.
+  function handleMatchClick(match: SearchSuggestion) {
+    if (match.type === "case") return goToCase(match.id);
+    if (match.caseId) return goToCase(match.caseId);
+    runSearch(value);
   }
 
   function clearSearch() {
@@ -184,7 +176,7 @@ export function SearchBar({
                   <button
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => (match.type === "case" ? goToCase(match.id) : runSearch(value))}
+                    onClick={() => handleMatchClick(match)}
                     className="hover:bg-muted flex w-full flex-col items-stretch gap-0.5 px-4 py-2 text-left text-[13.5px]"
                   >
                     <span className="flex items-center gap-2.5">

@@ -28,7 +28,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { updateMemory, deleteMemory } from "@/lib/actions/memories";
-import { formatDate, formatDateTime, previewText } from "@/lib/utils";
+import { cn, formatDate, formatDateTime, previewText, highlightMatch } from "@/lib/utils";
 import { MemoryCaseSelect } from "@/components/dashboard/memory-case-select";
 import type { Memory } from "@/lib/types";
 
@@ -39,13 +39,17 @@ export function MemoryList({
   emptyLabel = "No memories yet.",
   locale,
   timeZone,
+  bare = false,
+  query,
 }: {
-  memories: Memory[];
+  memories: (Memory & { matchedField?: string; matchedSnippet?: string })[];
   cases?: { id: string; title: string }[];
   showCaseLink?: boolean;
   emptyLabel?: string;
   locale: string;
   timeZone: string;
+  bare?: boolean;
+  query?: string;
 }) {
   const [selected, setSelected] = useState<Memory | null>(null);
   const [editing, setEditing] = useState(false);
@@ -63,7 +67,7 @@ export function MemoryList({
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className={bare ? "divide-border flex flex-col divide-y" : "flex flex-col gap-3"}>
         {memories.map((memory) => (
           <button
             key={memory.id}
@@ -72,7 +76,10 @@ export function MemoryList({
               setSelected(memory);
               setEditing(false);
             }}
-            className="flex cursor-pointer flex-col gap-2 rounded-lg border p-4 text-left transition-colors hover:bg-accent/50"
+            className={cn(
+              "flex cursor-pointer flex-col gap-2 p-4 text-left transition-colors hover:bg-accent/50",
+              !bare && "rounded-lg border",
+            )}
           >
             <div className="flex items-start justify-between gap-3">
               <p className="text-sm font-medium">{previewText(memory.content)}</p>
@@ -99,6 +106,12 @@ export function MemoryList({
                   </Link>
                 )}
               </div>
+            )}
+            {memory.matchedField && (
+              <p className="text-muted-foreground text-xs">
+                Matched: <span className="font-medium">{memory.matchedField}</span> —{" "}
+                {query ? highlightMatch(memory.matchedSnippet ?? "", query) : memory.matchedSnippet}
+              </p>
             )}
           </button>
         ))}

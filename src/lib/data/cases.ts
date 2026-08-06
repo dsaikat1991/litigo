@@ -119,6 +119,52 @@ export async function getCases(search?: string, status?: CaseStatus): Promise<Ca
   return attachCounts(supabase, data ?? []);
 }
 
+export interface DashboardCasesSummary {
+  continueWorking: Case[];
+  totalCases: number;
+  totalArguments: number;
+  totalResearch: number;
+}
+
+// Dashboard-home-specific: getCases() fetches every case and fans attachCounts()
+// out across all of them, but the home page only ever renders 3 "Continue
+// working" cards plus a total-counts stats line — attachCounts()'ing a case
+// list that could be hundreds long just to show 3 cards and some totals is
+// wasted work that scales with case count for no benefit. This pushes the
+// "soonest hearing first, nulls last, then most recently touched" sort into
+// SQL (limit 3 there instead of fetching everything and sorting in JS), and
+// gets the stats-line totals from cheap head-count queries instead of
+// summing per-case counts. getCases() itself is unchanged — /dashboard/cases
+// and /dashboard/search still need the full list.
+export async function getDashboardCases(): Promise<DashboardCasesSummary> {
+  const supabase = await createClient();
+
+  const [topCasesRes, totalCasesRes, totalArgumentsRes, totalResearchRes] = await Promise.all([
+    supabase
+      .from("cases")
+      .select("*")
+      .order("next_hearing_date", { ascending: true, nullsFirst: false })
+      .order("updated_at", { ascending: false })
+      .limit(3),
+    supabase.from("cases").select("id", { count: "exact", head: true }),
+    supabase.from("argument_notes").select("id", { count: "exact", head: true }),
+    supabase.from("research_notes").select("id", { count: "exact", head: true }),
+  ]);
+  if (topCasesRes.error) throw topCasesRes.error;
+  if (totalCasesRes.error) throw totalCasesRes.error;
+  if (totalArgumentsRes.error) throw totalArgumentsRes.error;
+  if (totalResearchRes.error) throw totalResearchRes.error;
+
+  const continueWorking = await attachCounts(supabase, topCasesRes.data ?? []);
+
+  return {
+    continueWorking,
+    totalCases: totalCasesRes.count ?? 0,
+    totalArguments: totalArgumentsRes.count ?? 0,
+    totalResearch: totalResearchRes.count ?? 0,
+  };
+}
+
 export async function getCaseById(id: string): Promise<Case | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("cases").select("*").eq("id", id).maybeSingle();

@@ -72,3 +72,49 @@ export function DashboardSidePanelSkeleton() {
     </div>
   );
 }
+
+// Fallback for app/dashboard/loading.tsx — Next.js swaps this in instantly
+// on navigation instead of blocking on the whole page's data waterfall,
+// roughly sized to the real layout so nothing jumps once it resolves.
+export function DashboardHomeSkeleton() {
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <SkeletonBlock className="h-7 w-48" />
+        <div className="flex items-center gap-2">
+          <SkeletonBlock className="h-8 w-28" />
+          <SkeletonBlock className="h-8 w-28" />
+          <SkeletonBlock className="h-8 w-24" />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SkeletonBlock className="h-[52px] w-full rounded-xl" />
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <SkeletonBlock key={i} className="h-7 w-20 rounded-lg" />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3.5">
+          <SkeletonBlock className="h-4 w-36" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonBlock key={i} className="h-56 w-full rounded-xl" />
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <SkeletonBlock key={i} className="h-40 w-full rounded-xl" />
+          ))}
+        </div>
+
+        <SkeletonBlock className="h-20 w-full rounded-xl" />
+      </div>
+    </div>
+  );
+}

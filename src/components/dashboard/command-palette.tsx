@@ -50,7 +50,7 @@ export function CommandPalette({ cases }: { cases: { id: string; title: string }
   function runSearch() {
     const trimmed = query.trim();
     setOpen(false);
-    router.push(trimmed ? `/dashboard?q=${encodeURIComponent(trimmed)}` : "/dashboard");
+    router.push(trimmed ? `/dashboard/search?q=${encodeURIComponent(trimmed)}` : "/dashboard/search");
   }
 
   const trimmedQuery = query.trim();
