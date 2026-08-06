@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSignOut } from "@/components/dashboard/use-sign-out";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,10 +16,12 @@ export function HeaderProfileMenu({
   initials,
   fullName,
   email,
+  avatarUrl,
 }: {
   initials: string;
   fullName: string | null;
   email: string | null;
+  avatarUrl: string | null;
 }) {
   const handleSignOut = useSignOut();
 
@@ -31,6 +33,7 @@ export function HeaderProfileMenu({
         <DropdownMenuTrigger asChild>
           <button className="ml-1 cursor-pointer rounded-full outline-none select-none focus-visible:ring-2 focus-visible:ring-ring">
             <Avatar>
+              {avatarUrl && <AvatarImage src={avatarUrl} alt="" />}
               <AvatarFallback className="bg-verified text-background font-medium">
                 {initials}
               </AvatarFallback>
@@ -50,6 +53,10 @@ export function HeaderProfileMenu({
           <DropdownMenuItem asChild>
             <Link href="/dashboard/profile">Profile</Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/settings">Settings</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={handleSignOut}>Sign out</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

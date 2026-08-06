@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -19,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getInitials } from "@/lib/utils";
 import { redirect } from "next/navigation";
 
 export default async function ProfilePage({
@@ -90,14 +92,22 @@ export default async function ProfilePage({
             <Textarea id="bio" name="bio" rows={3} defaultValue={profile.bio ?? ""} />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="avatar_url">Avatar URL</Label>
-            <Input
-              id="avatar_url"
-              name="avatar_url"
-              type="url"
-              defaultValue={profile.avatarUrl ?? ""}
-              placeholder="https://…"
-            />
+            <Label htmlFor="avatar">Profile picture</Label>
+            <div className="flex items-center gap-3">
+              <Avatar size="lg">
+                <AvatarImage src={profile.avatarUrl ?? undefined} alt="" />
+                <AvatarFallback>{getInitials(profile.fullName, profile.email)}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col gap-1.5">
+                <Input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" />
+                {profile.avatarUrl && (
+                  <label className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                    <input type="checkbox" name="remove_avatar" value="1" />
+                    Remove current photo
+                  </label>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 

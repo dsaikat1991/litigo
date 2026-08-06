@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { NotificationPreferences, ProfessionalLicence } from "@/lib/types";
 
@@ -5,12 +6,17 @@ export interface CurrentProfile {
   id: string;
   email: string | null;
   fullName: string | null;
+  avatarUrl: string | null;
   locale: string;
   timezone: string;
   isAdmin: boolean;
 }
 
-export async function getCurrentProfile(): Promise<CurrentProfile | null> {
+// cache()'d — the dashboard layout and the dashboard page (and others)
+// each call this independently; without memoizing per-request, that's a
+// fully redundant Supabase round trip on every navigation. Same pattern
+// getAttentionAlerts() in lib/data/dashboard.ts already uses.
+export const getCurrentProfile = cache(async function getCurrentProfile(): Promise<CurrentProfile | null> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -19,7 +25,7 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, locale, timezone, is_admin")
+    .select("full_name, avatar_url, locale, timezone, is_admin")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -27,11 +33,12 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
     id: user.id,
     email: user.email ?? null,
     fullName: profile?.full_name ?? null,
+    avatarUrl: profile?.avatar_url ?? null,
     locale: profile?.locale ?? "en-IN",
     timezone: profile?.timezone ?? "Asia/Kolkata",
     isAdmin: profile?.is_admin ?? false,
   };
-}
+});
 
 export interface FullProfile {
   id: string;

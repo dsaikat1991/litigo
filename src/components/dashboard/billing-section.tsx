@@ -6,6 +6,7 @@ import { cancelSubscription } from "@/lib/actions/billing";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import type { Subscription, SubscriptionPlan } from "@/lib/types";
+import { planLabel } from "@/lib/subscription-plan";
 import { RazorpayCheckoutButton } from "@/components/dashboard/razorpay-checkout-button";
 
 type Tier = "basic" | "pro";
@@ -25,14 +26,6 @@ const STATUS_LABELS: Record<string, string> = {
   completed: "completed",
   expired: "expired",
 };
-
-function planTier(plan: SubscriptionPlan): Tier {
-  return plan.startsWith("basic") ? "basic" : "pro";
-}
-
-function planLabel(plan: SubscriptionPlan): string {
-  return planTier(plan) === "basic" ? "Basic" : "Pro";
-}
 
 function formatPrice(amount: number) {
   return new Intl.NumberFormat("en-IN").format(amount);

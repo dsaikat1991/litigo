@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { getCurrentProfile, getNotificationPreferences } from "@/lib/data/profile";
-import { getCurrentSubscription } from "@/lib/data/subscription";
 import { updateNotificationPreferences } from "@/lib/actions/settings";
 import { Button } from "@/components/ui/button";
 import { NotificationPreferencesGrid } from "@/components/dashboard/notification-preferences-grid";
 import { AccountSection } from "@/components/dashboard/account-section";
-import { BillingSection } from "@/components/dashboard/billing-section";
 import { DeleteAccountButton } from "@/components/dashboard/delete-account-button";
 
 export default async function SettingsPage({
@@ -19,11 +17,7 @@ export default async function SettingsPage({
   }>;
 }) {
   const { saved, error, emailPending, passwordChanged } = await searchParams;
-  const [prefs, profile, subscription] = await Promise.all([
-    getNotificationPreferences(),
-    getCurrentProfile(),
-    getCurrentSubscription(),
-  ]);
+  const [prefs, profile] = await Promise.all([getNotificationPreferences(), getCurrentProfile()]);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
@@ -66,19 +60,6 @@ export default async function SettingsPage({
       </form>
 
       <AccountSection email={profile?.email ?? ""} />
-
-      <section className="flex flex-col gap-4 rounded-lg border p-4">
-        <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          Billing
-        </h2>
-        <BillingSection
-          subscription={subscription}
-          fullName={profile?.fullName ?? null}
-          email={profile?.email ?? null}
-          locale={profile?.locale ?? "en-IN"}
-          timeZone={profile?.timezone ?? "Asia/Kolkata"}
-        />
-      </section>
 
       <section className="border-destructive/30 flex flex-col gap-4 rounded-lg border p-4">
         <div>
