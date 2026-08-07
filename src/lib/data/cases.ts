@@ -7,7 +7,7 @@ async function attachCounts(supabase: SupabaseClient, cases: Case[]): Promise<Ca
   if (cases.length === 0) return [];
 
   const caseIds = cases.map((c) => c.id);
-  const [argumentRows, researchRows, memoryRows, documentRows, orderRows] = await Promise.all([
+  const [argumentRows, researchRows, memoryRows, documentRows, orderRows, pendingTaskRows] = await Promise.all([
     supabase.from("argument_notes").select("case_id").in("case_id", caseIds),
     supabase.from("research_notes").select("case_id").in("case_id", caseIds),
     // Ordered newest-first and carrying content/created_at (not just
@@ -23,12 +23,23 @@ async function attachCounts(supabase: SupabaseClient, cases: Case[]): Promise<Ca
       .order("created_at", { ascending: false }),
     supabase.from("hearing_documents").select("case_id").in("case_id", caseIds),
     supabase.from("case_events").select("case_id").eq("event_type", "order").in("case_id", caseIds),
+    // Same "sort so the first row per case_id wins" trick as memories above
+    // — soonest due date first (undated tasks last), so the first pending
+    // task seen per case is the one worth surfacing as "Next action".
+    supabase
+      .from("tasks")
+      .select("case_id, title, due_date, created_at")
+      .in("case_id", caseIds)
+      .eq("is_done", false)
+      .order("due_date", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: true }),
   ]);
   if (argumentRows.error) throw argumentRows.error;
   if (researchRows.error) throw researchRows.error;
   if (memoryRows.error) throw memoryRows.error;
   if (documentRows.error) throw documentRows.error;
   if (orderRows.error) throw orderRows.error;
+  if (pendingTaskRows.error) throw pendingTaskRows.error;
 
   const countBy = (rows: { case_id: string | null }[]) => {
     const map = new Map<string, number>();
@@ -54,6 +65,13 @@ async function attachCounts(supabase: SupabaseClient, cases: Case[]): Promise<Ca
     });
   }
 
+  const pendingTaskCounts = countBy(pendingTaskRows.data);
+  const nextActionByCase = new Map<string, string>();
+  for (const row of pendingTaskRows.data) {
+    if (!row.case_id || nextActionByCase.has(row.case_id)) continue;
+    nextActionByCase.set(row.case_id, row.title);
+  }
+
   return cases.map((c) => ({
     ...c,
     argument_count: argumentCounts.get(c.id) ?? 0,
@@ -62,6 +80,8 @@ async function attachCounts(supabase: SupabaseClient, cases: Case[]): Promise<Ca
     document_count: documentCounts.get(c.id) ?? 0,
     order_count: orderCounts.get(c.id) ?? 0,
     latest_memory: latestMemoryByCase.get(c.id) ?? null,
+    next_action: nextActionByCase.get(c.id) ?? null,
+    pending_task_count: pendingTaskCounts.get(c.id) ?? 0,
   }));
 }
 
@@ -127,12 +147,12 @@ export interface DashboardCasesSummary {
 }
 
 // Dashboard-home-specific: getCases() fetches every case and fans attachCounts()
-// out across all of them, but the home page only ever renders 3 "Continue
+// out across all of them, but the home page only ever renders 2 "Continue
 // working" cards plus a total-counts stats line — attachCounts()'ing a case
-// list that could be hundreds long just to show 3 cards and some totals is
+// list that could be hundreds long just to show 2 cards and some totals is
 // wasted work that scales with case count for no benefit. This pushes the
 // "soonest hearing first, nulls last, then most recently touched" sort into
-// SQL (limit 3 there instead of fetching everything and sorting in JS), and
+// SQL (limit 2 there instead of fetching everything and sorting in JS), and
 // gets the stats-line totals from cheap head-count queries instead of
 // summing per-case counts. getCases() itself is unchanged — /dashboard/cases
 // and /dashboard/search still need the full list.
@@ -145,7 +165,7 @@ export async function getDashboardCases(): Promise<DashboardCasesSummary> {
       .select("*")
       .order("next_hearing_date", { ascending: true, nullsFirst: false })
       .order("updated_at", { ascending: false })
-      .limit(3),
+      .limit(2),
     supabase.from("cases").select("id", { count: "exact", head: true }),
     supabase.from("argument_notes").select("id", { count: "exact", head: true }),
     supabase.from("research_notes").select("id", { count: "exact", head: true }),

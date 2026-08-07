@@ -6,11 +6,11 @@ export function ArgumentLibrary({ issues }: { issues: RecentArgumentIssue[] }) {
   if (issues.length === 0) return null;
 
   return (
-    <div className="border-x p-4">
+    <div className="border p-4">
       <h3 className="text-sm font-medium">Argument Library</h3>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {issues.map(({ issue }) => (
-          <Link key={issue} href={`/dashboard?q=${encodeURIComponent(issue)}`}>
+          <Link key={issue} href={`/dashboard/search?q=${encodeURIComponent(issue)}`}>
             <Badge variant="outline" className="font-normal transition-transform hover:scale-105 hover:bg-muted">
               {issue}
             </Badge>

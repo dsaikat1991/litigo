@@ -8,23 +8,36 @@ import { getPublishedBlogPosts } from "@/lib/data/blog";
 
 // `href: null` marks a page that doesn't exist yet — rendered as plain
 // text rather than a link so the footer never points somewhere that 404s.
-// Swap in a real href once each page is built.
-const FOOTER_COLUMNS = [
+// Swap in a real href once each page is built. Explicitly typed (not
+// `as const`) so `href: string | null` still holds even on a render where
+// every current entry happens to have a real href — otherwise TS narrows
+// the type from the literal values actually present and the `href ? ... :
+// ...` branch below stops type-checking the moment no entry is null.
+interface FooterLink {
+  href: string | null;
+  label: string;
+}
+interface FooterColumn {
+  title: string;
+  links: FooterLink[];
+}
+
+const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Product",
     links: [
-      { href: null, label: "Features" },
+      { href: "/features", label: "Features" },
       { href: "/pricing", label: "Pricing" },
-      { href: null, label: "Security" },
-      { href: null, label: "Changelog" },
+      { href: "/security", label: "Security" },
+      { href: "/changelog", label: "Changelog" },
     ],
   },
   {
     title: "Company",
     links: [
       { href: "/about", label: "About" },
-      { href: null, label: "Our Story" },
-      { href: null, label: "Careers" },
+      { href: "/our-story", label: "Our Story" },
+      { href: "/careers", label: "Careers" },
       { href: "/contact", label: "Contact" },
     ],
   },
@@ -32,9 +45,8 @@ const FOOTER_COLUMNS = [
     title: "Resources",
     links: [
       { href: "/blog", label: "Blog" },
-      { href: null, label: "Documentation" },
-      { href: null, label: "Help Centre" },
-      { href: null, label: "Product Updates" },
+      { href: "/docs", label: "Documentation" },
+      { href: "/help", label: "Help Centre" },
     ],
   },
   {
@@ -42,23 +54,17 @@ const FOOTER_COLUMNS = [
     links: [
       { href: "/terms", label: "Terms of Service" },
       { href: "/privacy", label: "Privacy Policy" },
-      { href: null, label: "Cookie Policy" },
-      { href: null, label: "Security Policy" },
-      { href: null, label: "Data Processing Agreement (DPA)" },
-      { href: null, label: "Acceptable Use Policy" },
-      { href: null, label: "AI Transparency" },
+      { href: "/cookie-policy", label: "Cookie Policy" },
+      { href: "/refund-policy", label: "Refund & Cancellation Policy" },
+      { href: "/acceptable-use-policy", label: "Acceptable Use Policy" },
     ],
   },
-] as const;
+];
 
-// Social handles don't exist yet — rendered as plain (non-linking) icon
-// tiles until real profiles are created, same placeholder convention as
-// the FOOTER_COLUMNS links above.
 const SOCIAL_LINKS = [
-  { label: "LinkedIn", initials: "in" },
-  { label: "Facebook", initials: "f" },
-  { label: "Instagram", initials: "ig" },
-  { label: "YouTube", initials: "yt" },
+  { label: "LinkedIn", initials: "in", href: "https://www.linkedin.com/company/litigoofficial/" },
+  { label: "Facebook", initials: "f", href: "https://www.facebook.com/mylitigo" },
+  { label: "Instagram", initials: "ig", href: "https://www.instagram.com/mylitigo/" },
 ] as const;
 
 // These SVGs each fill their own viewBox with no meaningful padding, so
@@ -394,13 +400,16 @@ export default async function Home() {
                 <p className="text-sm font-semibold">Connect</p>
                 <div className="flex items-center gap-2">
                   {SOCIAL_LINKS.map((social) => (
-                    <span
+                    <a
                       key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       aria-label={social.label}
-                      className="border-border text-muted-foreground flex size-8 items-center justify-center rounded-md border text-xs font-medium"
+                      className="border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 flex size-8 items-center justify-center rounded-md border text-xs font-medium"
                     >
                       {social.initials}
-                    </span>
+                    </a>
                   ))}
                 </div>
               </div>

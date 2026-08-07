@@ -7,7 +7,7 @@ export function KnowledgeGaps({ items }: { items: KnowledgeGapItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="border-x p-4">
+    <div className="border p-4">
       <h3 className="text-sm font-medium">Knowledge Waiting to be Captured</h3>
       <ul className="mt-3 flex flex-col gap-3">
         {items.map((item) => (

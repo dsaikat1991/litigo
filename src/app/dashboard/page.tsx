@@ -95,70 +95,77 @@ export default async function DashboardPage() {
             <div className="flex flex-col gap-6">
               <TodaysFocus items={todaysFocus} />
 
-              <section className="flex flex-col gap-3.5">
-                {totalCases > 0 && (
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <Briefcase className="text-muted-foreground size-4" />
-                      <h2 className="text-sm font-medium">Continue working</h2>
+              <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.55fr_1fr]">
+                <section className="flex min-w-0 flex-col gap-3.5">
+                  {totalCases > 0 && (
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="text-muted-foreground size-4" />
+                        <h2 className="text-sm font-medium">Continue working</h2>
+                      </div>
+                      {totalCases > continueWorkingCases.length && (
+                        <Link
+                          href="/dashboard/cases"
+                          className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
+                        >
+                          View all
+                          <ArrowRight className="size-3" />
+                        </Link>
+                      )}
                     </div>
-                    {totalCases > continueWorkingCases.length && (
-                      <Link
-                        href="/dashboard/cases"
-                        className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
-                      >
-                        View all
-                        <ArrowRight className="size-3" />
-                      </Link>
+                  )}
+                  {totalCases === 0 ? (
+                    <EmptyStatePanel
+                      icon={FolderPlus}
+                      title="No cases yet"
+                      description="Add the matter you're working on now — arguments and research can come later."
+                      action={<NewCaseTriggerButton />}
+                    />
+                  ) : (
+                    <div className="flex min-w-0 flex-col gap-3">
+                      {continueWorkingCases.map((c) => (
+                        <CaseCard key={c.id} caseItem={c} locale={locale} timeZone={timeZone} />
+                      ))}
+                    </div>
+                  )}
+                </section>
+
+                {(memories.length > 0 || knowledgeGaps.length > 0) && (
+                  <div className="flex flex-col gap-4">
+                    {memories.length > 0 && (
+                      <div className="border p-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <h3 className="text-sm font-medium">Recent Memories</h3>
+                          <Link
+                            href="/dashboard/memories"
+                            className="text-muted-foreground hover:text-foreground text-xs"
+                          >
+                            View all
+                          </Link>
+                        </div>
+                        <div className="mt-2">
+                          <MemoryList
+                            memories={memories.slice(0, 5)}
+                            cases={caseOptions}
+                            showCaseLink
+                            locale={locale}
+                            timeZone={timeZone}
+                          />
+                        </div>
+                      </div>
                     )}
+                    <KnowledgeGaps items={knowledgeGaps} />
                   </div>
                 )}
-                {totalCases === 0 ? (
-                  <EmptyStatePanel
-                    icon={FolderPlus}
-                    title="No cases yet"
-                    description="Add the matter you're working on now — arguments and research can come later."
-                    action={<NewCaseTriggerButton />}
-                  />
-                ) : (
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {continueWorkingCases.map((c) => (
-                      <CaseCard key={c.id} caseItem={c} locale={locale} timeZone={timeZone} />
-                    ))}
-                  </div>
-                )}
-              </section>
+              </div>
 
               <Suspense fallback={null}>
                 <ReflectionBannerAsync timeZone={timeZone} />
               </Suspense>
 
-              {(totalCases > 0 || memories.length > 0) && (
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                  {memories.length > 0 && (
-                    <div className="border-x p-4">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-sm font-medium">Recent Memories</h3>
-                        <Link
-                          href="/dashboard/memories"
-                          className="text-muted-foreground hover:text-foreground text-xs"
-                        >
-                          View all
-                        </Link>
-                      </div>
-                      <div className="mt-2">
-                        <MemoryList
-                          memories={memories.slice(0, 5)}
-                          cases={caseOptions}
-                          showCaseLink
-                          locale={locale}
-                          timeZone={timeZone}
-                        />
-                      </div>
-                    </div>
-                  )}
+              {(recentArgumentIssues.length > 0 || recentDocuments.length > 0) && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <ArgumentLibrary issues={recentArgumentIssues} />
-                  <KnowledgeGaps items={knowledgeGaps} />
                   <RecentDocuments documents={recentDocuments} locale={locale} timeZone={timeZone} />
                 </div>
               )}

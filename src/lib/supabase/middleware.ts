@@ -32,7 +32,25 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/signup") ||
     request.nextUrl.pathname.startsWith("/forgot-password");
-  const publicMarketingRoutes = ["/", "/about", "/how-it-works", "/terms", "/privacy", "/contact", "/pricing"];
+  const publicMarketingRoutes = [
+    "/",
+    "/about",
+    "/how-it-works",
+    "/terms",
+    "/privacy",
+    "/contact",
+    "/pricing",
+    "/features",
+    "/security",
+    "/changelog",
+    "/docs",
+    "/help",
+    "/cookie-policy",
+    "/our-story",
+    "/refund-policy",
+    "/acceptable-use-policy",
+    "/careers",
+  ];
   const isPublicRoute = publicMarketingRoutes.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/auth/callback") ||
     request.nextUrl.pathname.startsWith("/reset-password") ||

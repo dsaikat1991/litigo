@@ -13,7 +13,7 @@ export function RecentDocuments({
   if (documents.length === 0) return null;
 
   return (
-    <div className="border-x p-4">
+    <div className="border p-4">
       <h3 className="text-sm font-medium">Recent Documents</h3>
       <div className="mt-3">
         <DocumentList documents={documents} locale={locale} timeZone={timeZone} showCaseLink />

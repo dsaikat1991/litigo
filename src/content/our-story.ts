@@ -1,0 +1,167 @@
+export const OUR_STORY_TITLE = "It started with a sentence I kept saying to myself.";
+
+export const OUR_STORY_MARKDOWN = `
+> "I know I've argued this before. I just can't find it."
+
+Every advocate has had that moment.
+
+You remember researching a particular point of law. You remember an argument that persuaded the court. You remember reading a judgment that perfectly answered the issue before you.
+
+But remembering where you saved it is another matter entirely.
+
+Maybe it was in a notebook.
+
+Maybe inside an old brief.
+
+Maybe in a case diary.
+
+Maybe as a PDF buried somewhere on your computer.
+
+Maybe as a WhatsApp message you sent yourself late one night.
+
+You know the knowledge exists.
+
+Finding it becomes the difficult part.
+
+After enough of those moments, I stopped thinking of it as a personal organisational problem.
+
+I realised it was a problem with the way legal practice itself has evolved.
+
+We spend years building experience.
+
+Then we lose access to it.
+
+Every matter teaches an advocate something.
+
+A better argument.
+
+A stronger precedent.
+
+A mistake worth avoiding.
+
+A practical lesson that no textbook could have taught.
+
+Yet once a case is over, those lessons are usually scattered across dozens of places.
+
+When a similar matter appears years later, we often end up repeating research we've already done or rebuilding arguments we've already made—not because we forgot them, but because we couldn't retrieve them.
+
+That never felt right to me.
+
+Professional experience shouldn't disappear simply because it wasn't stored properly.
+
+So I decided to build the tool I wished I already had.
+
+I'm an advocate.
+
+Not a software company that decided to enter legal technology.
+
+Not someone trying to reinvent the legal profession.
+
+Just someone who experienced this problem repeatedly in practice and became convinced there had to be a better way.
+
+Litigo began with one simple idea:
+
+What if every case could permanently contribute to your legal memory?
+
+Instead of closing a file and moving on, what if every matter left behind something searchable?
+
+The arguments.
+
+The research.
+
+The authorities.
+
+The lessons.
+
+The strategy.
+
+Everything that made that matter valuable beyond its final order.
+
+That idea eventually became Litigo.
+
+## Building Litigo has been its own journey.
+
+When I started, I wasn't leading a team of engineers or backed by investors.
+
+There wasn't a roadmap handed to me.
+
+There wasn't a company behind me.
+
+There was simply a problem I believed deserved solving.
+
+So I began learning everything required to build it.
+
+Design.
+
+Product development.
+
+Software engineering.
+
+Infrastructure.
+
+User experience.
+
+Security.
+
+Every part of Litigo has been built one step at a time, often after court hours, weekends, and countless late nights.
+
+Not because building software was the goal.
+
+Because solving this problem was.
+
+## Built independently. Built carefully.
+
+Litigo is entirely bootstrapped.
+
+Every decision is made with a single question in mind:
+
+Does this genuinely help advocates practice better?
+
+That freedom matters.
+
+It means features aren't added simply because competitors have them.
+
+Growth isn't prioritised over usefulness.
+
+The product isn't trying to become everything for everyone.
+
+Instead, every improvement is guided by conversations with advocates and by the realities of litigation practice.
+
+The goal has always been to build software that feels like it was created by someone who actually understands what it means to prepare for court.
+
+## Why India first?
+
+Because meaningful software begins by understanding the people it's built for.
+
+The Indian legal system has its own pace, procedures, courts, terminology, and way of working.
+
+Rather than trying to build a generic global product from day one, Litigo focuses on solving this problem well for Indian advocates first.
+
+If we can genuinely improve the daily practice of litigation here, that's the foundation for everything that comes next.
+
+## We're only getting started.
+
+Litigo is still in its early days.
+
+There are countless ideas yet to build, countless improvements still to make, and many conversations with advocates that will shape where the product goes next.
+
+But the mission hasn't changed since the beginning.
+
+To make sure the knowledge you earn through years of litigation never becomes another forgotten notebook or another folder you'll never open again.
+
+Because every argument you make adds to your experience.
+
+Every case teaches something.
+
+Every lesson matters.
+
+It deserves to stay with you.
+
+## Thank you.
+
+If you're using Litigo, sharing feedback, reporting bugs, suggesting ideas, or simply following along, thank you.
+
+Building a product for advocates is only possible with advocates.
+
+I hope Litigo becomes a tool that quietly helps you every day—not by replacing your experience, but by helping you remember everything you've already earned.
+`;

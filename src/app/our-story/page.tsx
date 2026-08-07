@@ -1,20 +1,26 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/marketing/content-page";
-import { ABOUT_TITLE, ABOUT_MARKDOWN } from "@/content/about";
+import { OUR_STORY_TITLE, OUR_STORY_MARKDOWN } from "@/content/our-story";
 
 export const metadata: Metadata = {
-  title: "About — Litigo",
-  description:
-    "Litigo is a legal memory platform built for litigating advocates — not a case-diary or billing tool, but a place to keep the arguments, research, and lessons from every matter you've ever handled.",
+  title: "Our Story — Litigo",
+  description: "Why Litigo exists, and why it's built India-first, in the founder's own words.",
 };
 
-export default function AboutPage() {
+export default function OurStoryPage() {
   return (
     <ContentPage
-      eyebrow="About Litigo"
-      title={ABOUT_TITLE}
-      markdown={ABOUT_MARKDOWN}
+      eyebrow="Our Story"
+      title={OUR_STORY_TITLE}
+      markdown={OUR_STORY_MARKDOWN}
+      afterContent={
+        <p className="font-manrope text-foreground/90 -mt-4 text-[15px] leading-tight">
+          — <span className="font-semibold">Saikat Das</span>
+          <br />
+          Founder, Litigo
+        </p>
+      }
       footer={
         <div className="flex items-center gap-3">
           <Link

@@ -48,6 +48,8 @@ export interface Case {
   document_count?: number;
   order_count?: number;
   latest_memory?: { id: string; content: string; created_at: string } | null;
+  next_action?: string | null;
+  pending_task_count?: number;
 }
 
 export interface ArgumentNote {

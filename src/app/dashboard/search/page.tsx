@@ -63,15 +63,7 @@ export default async function SearchPage({
               <SectionHeader label="Cases" count={results.cases.length} />
               <div className="divide-border flex flex-col divide-y">
                 {results.cases.map((c) => (
-                  <CaseCard
-                    key={c.id}
-                    caseItem={c}
-                    locale={locale}
-                    timeZone={timeZone}
-                    bare
-                    query={trimmed}
-                    showDocumentCount
-                  />
+                  <CaseCard key={c.id} caseItem={c} locale={locale} timeZone={timeZone} bare query={trimmed} />
                 ))}
               </div>
             </section>
